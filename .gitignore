@@ -1,0 +1,7 @@
+
+javadoc.xml
+bin/**
+test/**
+classes/**
+dist/**
+cloudtest-soapui-project.xml
