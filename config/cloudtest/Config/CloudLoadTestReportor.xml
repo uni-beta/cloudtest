@@ -1,0 +1,61 @@
+<cloudTestCase assertRuleFile="">
+	<testCase id="CloudTestService_doLoadTest" assertId=""
+		returnFlag="true"
+		returnTo="CloudTestService_doLoadTest_CloudTestOutput"
+		desc="Cloud load testing">
+		<className>
+			com.unibeta.cloudtest.CloudTestService
+		</className>
+		<methodName>doLoadTest</methodName>
+		<parameter>
+			<dataType>java.lang.String</dataType>
+			<name>fileanme</name>
+			<parameterType>0</parameterType>
+			<value>"TestCase/com"</value>
+		</parameter>
+		<parameter>
+			<dataType>java.lang.Long</dataType>
+			<name>concurrent number</name>
+			<parameterType>0</parameterType>
+			<value>20L</value>
+		</parameter>
+		<parameter>
+			<dataType>java.lang.Long</dataType>
+			<name>start thread in fixed seconds</name>
+			<parameterType>0</parameterType>
+			<value>10L</value>
+		</parameter>
+	</testCase>
+	<testCase id="CloudTestReportor_sendReport" assertId=""
+		returnFlag="true" returnTo=""
+		desc="send report for performance testing">
+		<className>
+			com.unibeta.cloudtest.tool.CloudTestReportor
+		</className>
+		<methodName>sendReport</methodName>
+		<parameter>
+			<dataType>java.lang.String</dataType>
+			<name>mail address</name>
+			<parameterType>0</parameterType>
+			<value>
+				"xxx.xxx@mailhost.com"
+			</value>
+		</parameter>
+		<parameter>
+			<dataType>java.lang.String</dataType>
+			<name>mail subject</name>
+			<parameterType>0</parameterType>
+			<value>
+				"[LoadTest]Cloud Load Test Report"
+			</value>
+		</parameter>
+		<parameter>
+			<dataType>
+				com.unibeta.cloudtest.CloudTestOutput
+			</dataType>
+			<name>CloudTestOutput result</name>
+			<parameterType>0</parameterType>
+			<value>CloudTestService_doLoadTest_CloudTestOutput</value>
+		</parameter>
+	</testCase>
+</cloudTestCase>

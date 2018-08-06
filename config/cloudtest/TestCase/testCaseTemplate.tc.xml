@@ -1,0 +1,35 @@
+<!--
+
+For parameterType, 2 options are below: 
+0 stands for the java plain value(e.g "string value...", 12,12.5D ) or xml formed data(e.g <string>string value</string>, <int>12</int>,<double>12.5</double>), also java code such as 'new String("string value")'.
+1 stands for loading data from xml data file, such as 'd:\\data.xml'.
+
+For parameter's value, both attribute and element style are acceptable. 
+ -->
+<cloudTestCase assertRuleFile="assertRulesTemplate.assert.xml">
+    <testCase id="ConfigurationProxy_getCLOUDTEST_HOME" assertId ="ConfigurationProxy_getCLOUDTEST_HOME" returnFlag="true" returnTo="CLOUDTEST_HOME" desc="Test LocalConfigPathServicePlugin">
+        <className>com.unibeta.cloudtest.config.ConfigurationProxy</className>
+        <methodName>getCLOUDTEST_HOME</methodName>
+    </testCase>
+    <testCase id="XmlDataDigester_toXml" assertId="" returnFlag="true" desc="Test XmlDataDigester">
+		<className>com.unibeta.cloudtest.tool.XmlDataDigester</className>
+		<methodName>toXml</methodName>
+		<parameter name="className" value='"com.unibeta.cloudtest.CloudTestInput"' parameterType="0" dataType="java.lang.String" />
+		<parameter>
+			<name>fileName</name>
+			<dataType>java.lang.String</dataType>
+			<parameterType>0</parameterType>
+			<value>""</value>
+		</parameter>
+	</testCase>
+	<testCase id="CloudTestService_doTest" assertId ="" returnFlag="true" returnTo="" desc="CloudTestService is working">
+        <className>com.unibeta.cloudtest.CloudTestService</className>
+        <methodName>doTest</methodName>
+        <parameter>
+			<name>cloud test input</name>
+			<dataType>com.unibeta.cloudtest.CloudTestInput</dataType>
+			<parameterType>1</parameterType>
+			<value>TestData/testDataExample.xml</value>
+		</parameter>
+    </testCase>
+</cloudTestCase>

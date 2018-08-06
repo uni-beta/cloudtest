@@ -1,0 +1,54 @@
+<jbossesb xmlns="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.0.1.xsd" xmlns:dsx0="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.0.xsd">
+	<providers></providers>
+	<categorys></categorys>
+	<services>
+		<service category="CloudTestService" name="cloudTestServiceByParameter" description="Method Test">
+			<actions>
+				<action name="CloudTestAction1"
+					class="com.ebao.pub.soa.esb.action.InvokeServiceAction"
+					process="invoke">
+					<property name="config">
+						<reference ref="cloudTestInput" type="com.unibeta.cloudtest.CloudTestInput" />
+						<class value="com.unibeta.cloudtest.CloudTestService" method="doTest" />
+						<context value="Virtual User"/>
+					</property>
+				</action>
+			</actions>
+			<paramType name="testCase" type="com.unibeta.cloudtest.CloudTestInput" />
+			<returnType name="cloudTestResult" type="com.unibeta.cloudtest.CloudTestOutput" />
+		</service>
+		
+		
+		<service category="CloudTestService" name="cloudTestServiceByTestCase" description="Method Test">
+			<actions>
+				<action name="CloudTestAction2"
+					class="com.ebao.pub.soa.esb.action.InvokeServiceAction"
+					process="invoke">
+					<property name="config">
+						<reference ref="cloudCaseInput" type="com.unibeta.cloudtest.CloudCaseInput" />
+						<class value="com.unibeta.cloudtest.CloudTestService" method="doTest" />
+						<context value="Virtual User"/>
+					</property>
+				</action>
+			</actions>
+			<paramType name="cloudCaseInput" type="com.unibeta.cloudtest.CloudCaseInput" />
+			<returnType name="cloudTestResult" type="com.unibeta.cloudtest.CloudTestOutput" />
+		</service>
+		
+		<service category="CloudTestService" name="cloudLoadTestServiceByCase" description="Method Load Test">
+			<actions>
+				<action name="CloudTestAction3"
+					class="com.ebao.pub.soa.esb.action.InvokeServiceAction"
+					process="invoke">
+					<property name="config">
+						<reference ref="cloudLoadInput" type="com.unibeta.cloudtest.CloudLoadInput" />
+						<class value="com.unibeta.cloudtest.CloudTestService" method="doLoadTest" />
+						<context value="Virtual User"/>
+					</property>
+				</action>
+			</actions>
+			<paramType name="cloudLoadInput" type="com.unibeta.cloudtest.CloudLoadInput" />
+			<returnType name="cloudTestResult" type="com.unibeta.cloudtest.CloudTestOutput" />
+		</service>
+	</services>
+</jbossesb>

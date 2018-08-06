@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.unibeta.cloudtest.CloudTestInput>
+	<className>
+		com.unibeta.cloudtest.config.ConfigurationProxy
+	</className>
+	<methodName>setCLOUDTEST_HOME</methodName>
+	<parameter>
+		<com.unibeta.cloudtest.CloudTestInput_-CloudTestParameter>
+			<name>LocalConfigPath</name>
+			<dataType>java.lang.String</dataType>
+			<parameterType>0</parameterType>
+			<value>CLOUDTEST_HOME</value>
+		</com.unibeta.cloudtest.CloudTestInput_-CloudTestParameter>
+	</parameter>
+</com.unibeta.cloudtest.CloudTestInput>

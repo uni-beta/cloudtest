@@ -1,0 +1,27 @@
+<cloudTestCase assertRuleFile="">
+	<testCase id="CloudTestReport" assertId="" returnFlag="false"
+		desc="Invoke the report service and send mail report">
+		<className>
+			com.unibeta.cloudtest.tool.CloudTestReportor
+		</className>
+		<methodName>report</methodName>
+		<parameter>
+            <name>PorjectName-Module</name>
+            <dataType>java.lang.String</dataType>
+            <parameterType>0</parameterType>
+            <value>"[PorjectName-Module]"</value>
+        </parameter>
+        <parameter>
+            <name>caseFileName</name>
+            <dataType>java.lang.String</dataType>
+            <parameterType>0</parameterType>
+            <value>"TestCase"</value>
+        </parameter>
+        <parameter>
+            <name>email address to</name>
+            <dataType>java.lang.String</dataType>
+            <parameterType>0</parameterType>
+            <value>""</value>
+        </parameter>
+	</testCase>
+</cloudTestCase>
