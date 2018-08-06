@@ -18,4 +18,5 @@ Why CloudTest?
 14. Integrated with JUnit closely (Including JUnit4)
 15. Parallel computing supported
 16. Hotspots computing and report supported
+17. It is free forever!
 
