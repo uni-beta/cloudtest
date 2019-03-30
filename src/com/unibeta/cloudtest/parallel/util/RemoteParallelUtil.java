@@ -43,7 +43,7 @@ public class RemoteParallelUtil {
 
 	static Logger log = Logger.getLogger(RemoteParallelUtil.class);
 
-	public synchronized static String checkAndBackupDataToSlavesNode(Map<String, TestService> servers) {
+	public synchronized static String checkAndBackupDataToSlavesNode(Map<String, TestService> servers,Map<String, String> serversAddressMap) {
 
 		StringBuffer sb = new StringBuffer();
 		Map<String, TestService> validServers = new HashMap<String, TestService>();
@@ -82,7 +82,15 @@ public class RemoteParallelUtil {
 					String remoteHomePath = RemoteParallelUtil.setupCloudHomePath(testService, null);
 
 					if (!CommonUtils.isNullOrEmpty(remoteHomePath)) {
-						executor.execute(new CaseDataUploadingThread(testService, s, fileMap));
+						
+						String address = null;
+						if(null == serversAddressMap){
+							address = getSlaverServerById(s).address;
+						}else{
+							address = serversAddressMap.get(s);
+						}
+						
+						executor.execute(new CaseDataUploadingThread(testService, s,address ,fileMap));
 						validServers.put(s, testService);
 
 					} else {
@@ -158,7 +166,7 @@ public class RemoteParallelUtil {
 	}
 
 	public static String uploadToRemoteSlaveNode(TestService testService, String localFilePath, byte[] base64Code,
-			String remoteFilePath, String serverName) {
+			String remoteFilePath, String serverName,String testServiceAddress) {
 
 		if (null == testService) {
 			testService = new CloudTestService();
@@ -171,11 +179,11 @@ public class RemoteParallelUtil {
 
 		String errorMsg = null;
 
-		errorMsg = uploading(localFilePath, remoteFilePath, serverName);
+		errorMsg = uploading(localFilePath, remoteFilePath, serverName,testServiceAddress);
 
 		if (!CommonUtils.isNullOrEmpty(errorMsg)) {
 
-			output = uploading(testService, base64Code, remoteFilePath, serverName);
+			output = uploading(testService, base64Code, remoteFilePath, serverName,testServiceAddress);
 			if (!output.getStatus()) {
 				errorMsg = errorMsg + "\n" + output.getErrorMessage();
 				log.error(errorMsg+ "\nBlocked-Distribution was also failed.");
@@ -217,12 +225,12 @@ public class RemoteParallelUtil {
 
 	}
 
-	private static String uploading(String localFilePath, String remoteFilePath, String serverName) {
+	private static String uploading(String localFilePath, String remoteFilePath, String serverName,String testServiceAddress) {
 
 		String error = null;
 
 		try {
-			String serverAddress = getSlaverServerById(serverName).address;
+			String serverAddress = testServiceAddress;
 			if (CommonUtils.isNullOrEmpty(serverAddress)) {
 				error = serverName + " server address can not be matched.";
 			} else {
@@ -280,7 +288,7 @@ public class RemoteParallelUtil {
 
 	@Deprecated
 	private static CloudTestOutput uploading(TestService testService, byte[] base64Code, String filePath,
-			String serverName) {
+			String serverName,String testServiceAddress) {
 
 		CloudTestInput input;
 		List<CloudTestParameter> paras;
@@ -595,26 +603,28 @@ public class RemoteParallelUtil {
 
 		TestService testService;
 		String testServiceName;
+		String testServiceAddress;
 		Map<String, byte[]> fileMap;
 
-		public CaseDataUploadingThread(TestService testService, String name, Map<String, byte[]> fileMap) {
+		public CaseDataUploadingThread(TestService testService, String name,String address, Map<String, byte[]> fileMap) {
 
 			this.testService = testService;
 			this.testServiceName = name;
+			this.testServiceAddress = address;
 			this.fileMap = fileMap;
 		}
 
 		public void run() {
 
 			try {
-				this.uploadToSingleNode(this.testService, this.testServiceName, this.fileMap);
+				this.uploadToSingleNode(this.testService, this.testServiceName,testServiceAddress, this.fileMap);
 			} catch (Exception e) {
 				log.error("Uploading test case data to " + this.testServiceName + " failure, caused by "
 						+ e.getMessage());
 			}
 		}
 
-		private String uploadToSingleNode(TestService testService, String s, Map<String, byte[]> fileMap)
+		private String uploadToSingleNode(TestService testService, String s,String testServiceAddress, Map<String, byte[]> fileMap)
 				throws Exception {
 
 			String remoteHome = getRemoteCloudHomePath(testService);
@@ -646,7 +656,7 @@ public class RemoteParallelUtil {
 							.substring(ConfigurationProxy.getCLOUDTEST_HOME().replace("\\", "/").length());
 
 					String caseFullPath = (remoteHome + "/" + uri).replace("\\", "/");
-					String errorMsg = uploadToRemoteSlaveNode(testService, fs, fileMap.get(fs), caseFullPath, s);
+					String errorMsg = uploadToRemoteSlaveNode(testService, fs, fileMap.get(fs), caseFullPath, s,testServiceAddress);
 
 					if (!CommonUtils.isNullOrEmpty(errorMsg)) {
 						errs.append(errorMsg);

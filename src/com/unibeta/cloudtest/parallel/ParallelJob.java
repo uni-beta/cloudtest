@@ -41,15 +41,38 @@ public class ParallelJob {
 	static Logger log = Logger.getLogger(ParallelJob.class);
 
 	/**
-	 * Invoke parallel computing among all slave sites with indicate whether need
-	 * rollback home path or not.
+	 * Invoke parallel computing among all slave sites with indicate whether
+	 * need rollback home path or not.
 	 * 
 	 * @param caseUris
 	 * @param mail
 	 * @param needRollbackHomePath
 	 * @return
 	 */
-	public static CloudTestOutput run(String caseUris, String mail, boolean needRollbackHomePath) {
+	public static CloudTestOutput run(String caseUris, String mail,
+			boolean needRollbackHomePath) {
+
+		return run(null, null, caseUris, mail, needRollbackHomePath);
+
+	}
+
+	/**
+	 * Invoke parallel computing among all slave sites with indicate whether
+	 * need rollback home path or not.
+	 * 
+	 * @param callType
+	 *            : restful or webservice
+	 * 
+	 * @param servers
+	 *            key = server name, value = remote address
+	 * @param caseUris
+	 * @param mail
+	 * @param needRollbackHomePath
+	 * @return
+	 */
+	public static CloudTestOutput run(String callType,
+			Map<String, String> servers, String caseUris, String mail,
+			boolean needRollbackHomePath) {
 
 		CloudTestOutput output = new CloudTestOutput();
 
@@ -61,17 +84,36 @@ public class ParallelJob {
 			return output;
 		}
 
+		if (!CommonUtils.isNullOrEmpty(callType)
+				&& (!CloudTestConstants.CLOUDTEST_PARALLEL_RPC_TYPE_RESTFUL
+						.equalsIgnoreCase(callType) && !CloudTestConstants.CLOUDTEST_PARALLEL_RPC_TYPE_WEBSERVICE
+						.equalsIgnoreCase(callType))) {
+
+			output.setErrorMessage("only 'restful' or 'webservice' rpc type can be supported. ");
+			output.setStatus(false);
+
+			return output;
+		}
+
 		Map<String, TestService> serverMap = null;
 		Map<String, String> remoteServersHomePathMap = null;
 		String errorMsg = null;
 
 		try {
-			RemoteTestServiceProxyPlugin remoteProxy = CloudTestPluginFactory.getRemoteTestServiceProxyPlugin();
+			RemoteTestServiceProxyPlugin remoteProxy = CloudTestPluginFactory
+					.getRemoteTestServiceProxyPlugin();
 
-			serverMap = remoteProxy.create();
+			if (CommonUtils.isNullOrEmpty(callType)
+					|| CommonUtils.isNullOrEmpty(servers)) {
+				serverMap = remoteProxy.create();
+			} else {
+				serverMap = remoteProxy.create(callType, servers);
+			}
+
 			remoteServersHomePathMap = retrieveRemoteServersHomePathMap(serverMap);
 
-			errorMsg = RemoteParallelUtil.checkAndBackupDataToSlavesNode(serverMap);
+			errorMsg = RemoteParallelUtil
+					.checkAndBackupDataToSlavesNode(serverMap,servers);
 
 			// serverMap.put("localhost", new CloudTestService());
 
@@ -79,30 +121,36 @@ public class ParallelJob {
 			String[] uris = caseUris.split(",");
 
 			for (String uri : uris) {
-				String caseFilePath = ConfigurationProxy.getCloudTestRootPath() + uri;
+				String caseFilePath = ConfigurationProxy.getCloudTestRootPath()
+						+ uri;
 				taskMap.putAll(JobMapReducer.map(caseFilePath));
 			}
 
-			Map<String, Server> servers = RemoteParallelUtil.wrapToServer(serverMap);
+			Map<String, Server> servers_ = RemoteParallelUtil
+					.wrapToServer(serverMap);
 
-			if (servers.size() == 0) {
+			if (servers_.size() == 0) {
 				output.setErrorMessage("No valid slave server was found.");
 				output.setStatus(false);
 
 				return output;
 			}
 
-			output = computing(taskMap, servers, output);
+			output = computing(taskMap, servers_, output);
 
-			StringBuffer strb = RemoteParallelUtil.buildServerNamesString(serverMap);
-			log.info(
-					"Cloud Test Parallel Job done. Computed by " + strb + " duration is " + output.getRunTime() + "s.");
+			StringBuffer strb = RemoteParallelUtil
+					.buildServerNamesString(serverMap);
+			log.info("Cloud Test Parallel Job done. Computed by " + strb
+					+ " duration is " + output.getRunTime() + "s.");
 		} finally {
-			recoverRemoteServersHomePath(serverMap, remoteServersHomePathMap, needRollbackHomePath);
+			recoverRemoteServersHomePath(serverMap, remoteServersHomePathMap,
+					needRollbackHomePath);
 
 			if (!CommonUtils.isNullOrEmpty(errorMsg)) {
-				output.setErrorMessage(
-						errorMsg + "\n" + (output.getErrorMessage() == null ? "" : output.getErrorMessage()));
+				output.setErrorMessage(errorMsg
+						+ "\n"
+						+ (output.getErrorMessage() == null ? "" : output
+								.getErrorMessage()));
 			}
 
 			if (serverMap != null && serverMap.size() > 0) {
@@ -149,8 +197,10 @@ public class ParallelJob {
 		return run(caseUris, mail, false);
 	}
 
-	private static void recoverRemoteServersHomePath(Map<String, TestService> serverMap,
-			Map<String, String> remoteServersHomePathMap, boolean needRollbackHomePath) {
+	private static void recoverRemoteServersHomePath(
+			Map<String, TestService> serverMap,
+			Map<String, String> remoteServersHomePathMap,
+			boolean needRollbackHomePath) {
 
 		if (remoteServersHomePathMap == null || serverMap == null) {
 			return;
@@ -162,24 +212,29 @@ public class ParallelJob {
 			TestService testService = serverMap.get(name);
 
 			if (needRollbackHomePath) {
-				RemoteParallelUtil.setupCloudHomePath(testService, remoteHomePath);
-				log.info("reset cloudtest home path to '" + remoteHomePath + "' for server[name ='" + name + "']");
+				RemoteParallelUtil.setupCloudHomePath(testService,
+						remoteHomePath);
+				log.info("reset cloudtest home path to '" + remoteHomePath
+						+ "' for server[name ='" + name + "']");
 			}
 
 			RemoteParallelUtil.setRemoteParallelJobUser(testService, null);
-			log.info("released server[name = '" + name + "'] to free for parallel job service.");
+			log.info("released server[name = '" + name
+					+ "'] to free for parallel job service.");
 		}
 
 	}
 
-	private static Map<String, String> retrieveRemoteServersHomePathMap(Map<String, TestService> serverMap) {
+	private static Map<String, String> retrieveRemoteServersHomePathMap(
+			Map<String, TestService> serverMap) {
 
 		Map<String, String> map = new HashMap<String, String>();
 
 		for (String key : serverMap.keySet()) {
 			try {
 				TestService testService = serverMap.get(key);
-				String remoteCloudTestHomePath = RemoteParallelUtil.getRemoteCloudHomePath(testService);
+				String remoteCloudTestHomePath = RemoteParallelUtil
+						.getRemoteCloudHomePath(testService);
 
 				map.put(key, remoteCloudTestHomePath);
 
@@ -191,8 +246,8 @@ public class ParallelJob {
 		return map;
 	}
 
-	private static CloudTestOutput computing(Map<String, Task> taskMap, Map<String, Server> servers,
-			CloudTestOutput output) {
+	private static CloudTestOutput computing(Map<String, Task> taskMap,
+			Map<String, Server> servers, CloudTestOutput output) {
 
 		long start = System.currentTimeMillis();
 		long end = -1;
@@ -202,8 +257,9 @@ public class ParallelJob {
 			log.info("Cloud Test Parallel Job startup...");
 			while (!isAllTaskDone(taskMap.values())) {
 
-				ThreadPoolExecutor executor = new ThreadPoolExecutor(taskMap.size(), taskMap.size(), 60,
-						TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+				ThreadPoolExecutor executor = new ThreadPoolExecutor(
+						taskMap.size(), taskMap.size(), 60, TimeUnit.SECONDS,
+						new LinkedBlockingQueue<Runnable>());
 
 				JobMapReducer.optimize(taskMap, servers);
 
@@ -212,7 +268,8 @@ public class ParallelJob {
 					if (!CloudTestConstants.CLOUDTEST_PARALLEL_DISTRIBUTION_MODE_PARALLEL
 							.equalsIgnoreCase(PluginConfigProxy
 									.getParamValueByName(CloudTestConstants.CLOUDTEST_PARALLEL_DISTRIBUTION_MODE))) {
-						CloudTestLinkedServiceExecutor command = new CloudTestLinkedServiceExecutor(server);
+						CloudTestLinkedServiceExecutor command = new CloudTestLinkedServiceExecutor(
+								server);
 
 						executor.execute(command);
 						threadList.add(command);
@@ -222,7 +279,8 @@ public class ParallelJob {
 							Task task = server.getTaskQueue().poll();
 							task.setOwner(server.getId());
 
-							executor.execute(new CloudTestSingleServiceExecutor(server, task));
+							executor.execute(new CloudTestSingleServiceExecutor(
+									server, task));
 						}
 					}
 
@@ -248,7 +306,8 @@ public class ParallelJob {
 			end = System.currentTimeMillis();
 
 		} catch (Exception e) {
-			String printExceptionStackTrace = CloudTestUtils.printExceptionStackTrace(e);
+			String printExceptionStackTrace = CloudTestUtils
+					.printExceptionStackTrace(e);
 			log.error(printExceptionStackTrace);
 
 			output.setErrorMessage(printExceptionStackTrace);
@@ -280,7 +339,8 @@ public class ParallelJob {
 		return output;
 	}
 
-	private static void sendReport(String mail, CloudTestOutput output, String froms) {
+	private static void sendReport(String mail, CloudTestOutput output,
+			String froms) {
 
 		try {
 			String subject = "Parallel " + "Cloud Test Report@" + new Date();
@@ -288,7 +348,8 @@ public class ParallelJob {
 			String userName = System.getProperty("user.name");
 			subject = subject + " From " + froms + " by " + userName;
 
-			com.unibeta.cloudtest.tool.CloudTestReportor.sendReport(mail, subject, output, "parallel");
+			com.unibeta.cloudtest.tool.CloudTestReportor.sendReport(mail,
+					subject, output, "parallel");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -298,7 +359,8 @@ public class ParallelJob {
 
 		for (Task t : values) {
 
-			if (t.getStatus() == Task.STATUS_DONE || t.getStatus() == Task.STATUS_REJECTED) {
+			if (t.getStatus() == Task.STATUS_DONE
+					|| t.getStatus() == Task.STATUS_REJECTED) {
 				continue;
 			} else {
 				return false;
@@ -308,11 +370,12 @@ public class ParallelJob {
 	}
 
 	/**
-	 * Invoke parallel computing among all slave sites with specified cloudtest home
-	 * path.
+	 * Invoke parallel computing among all slave sites with specified cloudtest
+	 * home path.
 	 * 
 	 * @param cloudtestHome
-	 *            the home path of current target cloudtest located. com.unibeta.
+	 *            the home path of current target cloudtest located.
+	 *            com.unibeta.
 	 *            cloudtest.config.ConfigurationProxy.setCLOUDTEST_HOME
 	 *            (cloudtestHome).
 	 * @param caseUri
@@ -321,7 +384,8 @@ public class ParallelJob {
 	 *            address for testing report, eg: abc@abc.com
 	 * @return cloud test result
 	 */
-	public static CloudTestOutput run(String cloudtestHome, String caseUri, String mail) {
+	public static CloudTestOutput run(String cloudtestHome, String caseUri,
+			String mail) {
 
 		String homePath = ConfigurationProxy.getCLOUDTEST_HOME();
 
@@ -333,11 +397,12 @@ public class ParallelJob {
 	}
 
 	/**
-	 * Invoke parallel computing among all slave sites with specified cloudtest home
-	 * path.
+	 * Invoke parallel computing among all slave sites with specified cloudtest
+	 * home path.
 	 * 
 	 * @param cloudtestHome
-	 *            the home path of current target cloudtest located. com.unibeta.
+	 *            the home path of current target cloudtest located.
+	 *            com.unibeta.
 	 *            cloudtest.config.ConfigurationProxy.setCLOUDTEST_HOME
 	 *            (cloudtestHome).
 	 * @param caseUri
@@ -348,12 +413,48 @@ public class ParallelJob {
 	 *            whether need rollback home path.
 	 * @return cloud test result
 	 */
-	public static CloudTestOutput run(String cloudtestHome, String caseUri, String mail, boolean needRollbackHomePath) {
+	public static CloudTestOutput run(String cloudtestHome, String caseUri,
+			String mail, boolean needRollbackHomePath) {
 
 		String homePath = ConfigurationProxy.getCLOUDTEST_HOME();
 
 		ConfigurationProxy.setCLOUDTEST_HOME(cloudtestHome);
 		CloudTestOutput output = run(caseUri, mail, needRollbackHomePath);
+		ConfigurationProxy.setCLOUDTEST_HOME(homePath);
+
+		return output;
+	}
+
+	/**
+	 * Invoke parallel computing among all slave sites with specified cloudtest
+	 * home path and remote servers' definition map
+	 * 
+	 * @param callType
+	 *            : restful or webservice
+	 * @param servers
+	 *            key = server name, value = remote address
+	 * @param cloudtestHome
+	 *            the home path of current target cloudtest located.
+	 *            com.unibeta.
+	 *            cloudtest.config.ConfigurationProxy.setCLOUDTEST_HOME
+	 *            (cloudtestHome).
+	 * @param caseUri
+	 *            eg: TestCase/mytest
+	 * @param mail
+	 *            address for testing report, eg: abc@abc.com
+	 * @param needRollbackHomePath
+	 *            whether need rollback home path.
+	 * @return cloud test result
+	 */
+	public static CloudTestOutput run(String callType,
+			Map<String, String> servers, String cloudtestHome, String caseUri,
+			String mail, boolean needRollbackHomePath) {
+
+		String homePath = ConfigurationProxy.getCLOUDTEST_HOME();
+
+		ConfigurationProxy.setCLOUDTEST_HOME(cloudtestHome);
+		CloudTestOutput output = run(callType, servers, caseUri, mail,
+				needRollbackHomePath);
 		ConfigurationProxy.setCLOUDTEST_HOME(homePath);
 
 		return output;

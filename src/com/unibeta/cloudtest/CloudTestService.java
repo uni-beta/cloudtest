@@ -813,7 +813,10 @@ public class CloudTestService implements TestService {
 					CloudTestCase dependsCloudTestCase = ConfigurationProxy
 							.loadCloudTestCase(CloudTestUtils.resolveTestCaseImportsPath(cloudTestCase.ns, s)[0], null);
 
-					this.executeRootDependsCases(dependsCloudTestCase);
+					if (!dependsCloudTestCase.ns.equals(cloudTestCase.ns)) {
+						this.executeRootDependsCases(dependsCloudTestCase);
+					}
+					
 					for (Case c : dependsCloudTestCase.testCase) {
 						if (!isIgnoreCase(c.ignore)) {
 							this.executeDependsCases(c);
@@ -827,7 +830,10 @@ public class CloudTestService implements TestService {
 
 						CloudTestCase dependsCloudTestCase = ConfigurationProxy.loadCloudTestCase(c.ns, null);
 
-						this.executeRootDependsCases(dependsCloudTestCase);
+						if (!dependsCloudTestCase.ns.equals(cloudTestCase.ns)) {
+							this.executeRootDependsCases(dependsCloudTestCase);
+						}
+						
 						this.executeDependsCases(c);
 						invoke(c);
 					} else {

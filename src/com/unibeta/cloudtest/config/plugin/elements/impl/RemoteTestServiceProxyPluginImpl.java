@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.unibeta.cloudtest.TestService;
 import com.unibeta.cloudtest.config.plugin.PluginConfig;
+import com.unibeta.cloudtest.config.plugin.PluginConfig.SlaveServer;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
 import com.unibeta.cloudtest.config.plugin.elements.RemoteTestServiceProxyPlugin;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
@@ -22,10 +23,31 @@ public class RemoteTestServiceProxyPluginImpl implements
         RemoteTestServiceProxyPlugin {
 
     Logger log = Logger.getLogger(this.getClass());
+    
+    public Map<String, TestService> create(String callType, Map<String, String> servers){
+    	 
+    	Map<String, SlaveServer> slaveMap = new HashMap<String, SlaveServer>();
+    	
+    	if(CommonUtils.isNullOrEmpty(callType)||servers == null){
+    		 create0(callType, slaveMap );
+    	}
+    	
+    	for(String k:servers.keySet()){
+    		
+    		SlaveServer s = new SlaveServer();
+    		s.id = k;
+    		s.type = callType;
+    		s.address = servers.get(k);
+    		
+    		slaveMap.put(k, s);
+    	}
+    	
+		return  create0(callType, slaveMap );
+    }
 
     public Map<String, TestService> create() {
 
-        Map<String, TestService> services = new HashMap<String, TestService>();
+       
         String callType = null;
 
         try {
@@ -42,6 +64,13 @@ public class RemoteTestServiceProxyPluginImpl implements
         Map<String, PluginConfig.SlaveServer> slaveMap = PluginConfigProxy
                 .getSlaveServerMap();
 
+        return create0(callType, slaveMap);
+
+    }
+
+	private Map<String, TestService> create0(String callType,
+			Map<String, PluginConfig.SlaveServer> slaveMap) {
+		Map<String, TestService> services = new HashMap<String, TestService>();
         Set<String> set = slaveMap.keySet();
         for (String id : set) {
             PluginConfig.SlaveServer ss = slaveMap.get(id);
@@ -71,8 +100,7 @@ public class RemoteTestServiceProxyPluginImpl implements
             }
         }
         return services;
-
-    }
+	}
 
     private TestService createByWebservice(PluginConfig.SlaveServer salve)
             throws Exception {

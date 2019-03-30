@@ -210,7 +210,7 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 						String key = buildHotspotsKey(ot);
 
 						if (everFailedMap.get(key) != null) {
-							ot.setGroup(ot.getCaseId());
+							ot.setGroup(ot.getCaseId().replace(":", "."));
 
 							SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_FORMAT);
 
