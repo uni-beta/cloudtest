@@ -7,8 +7,9 @@
 			Map<String, String> servers, String cloudtestHome, String caseUri,
 			String mail, boolean needRollbackHomePath)
 2. Enhanced inner case dependence function.
-3. Fixed few bugs, such as hotspots report wording issues.
-4. Released v1.6.0
+3. Refined caseId index logic with eachId indicator
+4. Fixed few bugs, such as hotspots report wording and thread safety issues.
+5. Released v1.6.0
 		
 [2018-08-03 v1.5.0]
 1. Added 'eachId' configuration function for 'foreach'.
