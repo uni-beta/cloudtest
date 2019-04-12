@@ -1187,7 +1187,11 @@ public class CloudTestService implements TestService {
 					testCaseOutput.setTestCase(ConfigurationProxy.converCaseToCloudTestInput(c));
 				}
 
-				String caseId = c.id + "@" + (++i);
+				String caseId = c.id ;
+				if(CommonUtils.isNullOrEmpty(c.eachId)){
+					caseId = c.id + "@" + (++i);
+				}
+				
 				String eachId = c.eachId;
 
 				caseId = evaluateDataByCondition(caseId, eachId);

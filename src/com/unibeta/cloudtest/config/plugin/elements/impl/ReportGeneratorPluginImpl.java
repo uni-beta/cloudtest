@@ -296,12 +296,13 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 		return emailIndexHtml;
 	}
 
-	protected void runHistoryIndexThread(CloudTestOutput cloudTestOutput) {
+	protected void runHistoryIndexThread(CloudTestOutput cloudTestOutput) throws InterruptedException {
 
 		Thread indexThread = new Thread(new HistoryIndexWriterThread(cloudTestOutput));
 		indexThread.setPriority(Thread.MAX_PRIORITY);
 
 		indexThread.start();
+		indexThread.join();
 	}
 
 	protected void runHotspotsReportThread(CloudTestOutput cloudTestOutput) {
