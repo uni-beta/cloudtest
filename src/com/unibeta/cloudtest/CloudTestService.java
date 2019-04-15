@@ -816,7 +816,7 @@ public class CloudTestService implements TestService {
 					if (!dependsCloudTestCase.ns.equals(cloudTestCase.ns)) {
 						this.executeRootDependsCases(dependsCloudTestCase);
 					}
-					
+
 					for (Case c : dependsCloudTestCase.testCase) {
 						if (!isIgnoreCase(c.ignore)) {
 							this.executeDependsCases(c);
@@ -833,7 +833,7 @@ public class CloudTestService implements TestService {
 						if (!dependsCloudTestCase.ns.equals(cloudTestCase.ns)) {
 							this.executeRootDependsCases(dependsCloudTestCase);
 						}
-						
+
 						this.executeDependsCases(c);
 						invoke(c);
 					} else {
@@ -925,7 +925,7 @@ public class CloudTestService implements TestService {
 			ignoreObj = ObjectDigester.fromJava(ignoreExpress);
 		} catch (Exception e) {
 			// e.printStackTrace();
-			logger.info("eval ingore expression '" + ignoreExpress + "'.caused by:" + e.getMessage());
+			logger.warn("eval ingore expression '" + ignoreExpress + "'.caused by:" + e.getMessage());
 			return null;
 		}
 
@@ -1063,7 +1063,7 @@ public class CloudTestService implements TestService {
 							returnObj = testCaseOutput.getReturnValue();
 							assertExecutionResult(c, assertFileName, input, testCaseOutput);
 						}
-					}else {
+					} else {
 						testCaseOutput = null;
 					}
 				}
@@ -1168,7 +1168,11 @@ public class CloudTestService implements TestService {
 
 					this.executeDependsCases(c);
 
-					if (this.isIgnoreCase(c.ignore)) {
+					Boolean ignoreCase = this.isIgnoreCase(c.ignore);
+					if (null == ignoreCase) {
+						logger.warn("eval ingore expression '" + c.ignore + "' failed for below 'eachvar' element:\n"
+								+ ObjectDigester.toXML(eachvar));
+					} else if (ignoreCase) {
 						continue;
 					}
 
@@ -1187,11 +1191,11 @@ public class CloudTestService implements TestService {
 					testCaseOutput.setTestCase(ConfigurationProxy.converCaseToCloudTestInput(c));
 				}
 
-				String caseId = c.id ;
-				if(CommonUtils.isNullOrEmpty(c.eachId)){
+				String caseId = c.id;
+				if (CommonUtils.isNullOrEmpty(c.eachId)) {
 					caseId = c.id + "@" + (++i);
 				}
-				
+
 				String eachId = c.eachId;
 
 				caseId = evaluateDataByCondition(caseId, eachId);
