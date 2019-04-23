@@ -1,4 +1,4 @@
-[2019-04-01 v1.6.0]
+[2019-04-23 v1.6.0]
 1. Enhanced com.unibeta.cloudtest.parallel.ParallelJob for api remote address injection.  
 	run(String callType,
 			Map<String, String> servers, String caseUris, String mail,
@@ -9,7 +9,8 @@
 2. Enhanced inner case dependence function.
 3. Refined caseId index logic with eachId indicator.
 4. Fixed few bugs, such as hotspots report wording and thread safety issues.
-5. Released v1.6.0
+5. cache engine is configurable with 'cloudtest.system.cache_type'. 'ehcache' for ehcache, others using local context.
+6. Released v1.6.0
 		
 [2018-08-03 v1.5.0]
 1. Added 'eachId' configuration function for 'foreach'.

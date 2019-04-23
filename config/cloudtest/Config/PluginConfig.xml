@@ -93,6 +93,7 @@
 	
 	<param name="cloudtest.recorder.case.ignore_duplicated.enable" value="false"/>
 	<param name="cloudtest.recorder.case.remove_duplicated.enable" value="false"/>
+	<param name="cloudtest.system.cache_type" value="ehcache"/>
 
 	<slave-servers>
 		<!-- <server id="slave-server1" address="http://localhost1:8080/unibeta/webservice/cloudtest" 
