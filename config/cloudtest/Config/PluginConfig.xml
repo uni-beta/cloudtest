@@ -93,6 +93,7 @@
 	
 	<param name="cloudtest.recorder.case.ignore_duplicated.enable" value="false"/>
 	<param name="cloudtest.recorder.case.remove_duplicated.enable" value="false"/>
+	<!--system cache engine configuration, 'ehcache' or 'cloudcontext', by default using 'cloudcontext' -->
 	<param name="cloudtest.system.cache_type" value="ehcache"/>
 
 	<slave-servers>
