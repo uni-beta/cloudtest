@@ -17,6 +17,7 @@ import com.unibeta.cloudtest.config.CacheManagerFactory;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.impl.CloudTestClassLoader;
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
+import com.unibeta.cloudtest.config.plugin.PluginConfig;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.cloudtest.tool.Java2TestCases;
@@ -52,7 +53,8 @@ public class ObjectDigester {
 			path = ConfigurationProxy.getCloudTestRootPath() + fileName;
 		}
 
-		return x.fromXML(XmlUtils.paserDocumentToString(XmlUtils.getDocumentByFileName(path)));
+		return x.fromXML(XmlUtils.paserDocumentToString(XmlUtils
+				.getDocumentByFileName(path)));
 	}
 
 	/**
@@ -65,7 +67,8 @@ public class ObjectDigester {
 
 		while (null != xml && xml.startsWith(CloudTestConstants.CDATA_START)
 				&& xml.endsWith(CloudTestConstants.CDATA_END)) {
-			xml = xml.substring(xml.indexOf(CloudTestConstants.CDATA_START) + CloudTestConstants.CDATA_START.length(),
+			xml = xml.substring(xml.indexOf(CloudTestConstants.CDATA_START)
+					+ CloudTestConstants.CDATA_START.length(),
 					xml.lastIndexOf(CloudTestConstants.CDATA_END));
 		}
 
@@ -86,21 +89,21 @@ public class ObjectDigester {
 
 		return x.toXML(obj);
 	}
-	
+
 	/**
 	 * Convert object to xml string and save to target file.
 	 * 
 	 * @param obj
 	 * @param filePath
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public static void toXMLFile(Object obj,String filePath) throws Exception {
+	public static void toXMLFile(Object obj, String filePath) throws Exception {
 		XmlUtils.prettyPrint(x.toXML(obj), filePath);
 	}
 
 	/**
-	 * Create object from java source code in string type. Using BeanShell engine by
-	 * default.
+	 * Create object from java source code in string type. Using BeanShell
+	 * engine by default.
 	 * 
 	 * @param src
 	 *            java src code in string
@@ -109,19 +112,23 @@ public class ObjectDigester {
 	 */
 	public static Object fromJava(String src) throws Exception {
 
-		String scriptEngine = PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE);
+		String scriptEngine = PluginConfigProxy
+				.getParamValueByName(CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE);
 
 		if (CommonUtils.isNullOrEmpty(scriptEngine)) {
 			scriptEngine = CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE_BEANSHELL;
 		}
 
-		if (CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE_GROOVY.equalsIgnoreCase(scriptEngine)) {
+		if (CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE_GROOVY
+				.equalsIgnoreCase(scriptEngine)) {
 			return runGroovyShell(src);
-		} else if (CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE_BEANSHELL.equalsIgnoreCase(scriptEngine)) {
+		} else if (CloudTestConstants.CLOUDTEST_SCRIPT_ENGINE_BEANSHELL
+				.equalsIgnoreCase(scriptEngine)) {
 			return runBeanShell(src);
 		} else {
-			throw new Exception(scriptEngine
-					+ " script engine is not supported in current version, only groovy or beanshell are supported.");
+			throw new Exception(
+					scriptEngine
+							+ " script engine is not supported in current version, only groovy or beanshell are supported.");
 		}
 
 	}
@@ -157,7 +164,8 @@ public class ObjectDigester {
 
 		String fullPath = null;
 		if (!file.isAbsolute()) {
-			fullPath = ConfigurationProxy.getCloudTestRootPath() + File.separator + fileName;
+			fullPath = ConfigurationProxy.getCloudTestRootPath()
+					+ File.separator + fileName;
 		} else {
 			fullPath = fileName;
 		}
@@ -174,17 +182,22 @@ public class ObjectDigester {
 		} catch (ClassNotFoundException e) {
 			throw new Exception(
 					"groovy.lang.GroovyShell class was not found error. Below java statement need 'groovy.lang.GroovyShell' to interprete: \n"
-							+ src + "\nPlease configurate groovy.jar to classpath.",
+							+ src
+							+ "\nPlease configurate groovy.jar to classpath.",
 					e);
 		}
 
 		GroovyShell bsh = new GroovyShell();
 		for (String k : CacheManagerFactory.getInstance()
 
-				.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
+		.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
 
-			bsh.setVariable(k, CacheManagerFactory.getInstance()
-					.get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA, k));
+			bsh.setVariable(
+					k,
+					CacheManagerFactory
+							.getInstance()
+							.get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA,
+									k));
 
 		}
 
@@ -195,7 +208,8 @@ public class ObjectDigester {
 		}
 
 		if (null != CloudTestPluginFactory.getUserTransactionPlugin()) {
-			String before = CloudTestPluginFactory.class.getCanonicalName() + ".getUserTransactionPlugin().before();";
+			String before = CloudTestPluginFactory.class.getCanonicalName()
+					+ ".getUserTransactionPlugin().before();";
 			bsh.evaluate(before);
 		}
 
@@ -211,17 +225,20 @@ public class ObjectDigester {
 		} catch (ClassNotFoundException e) {
 			throw new Exception(
 					"bsh.Interpreter class was not found error. Below java statement need 'bsh.Interpreter' to interprete: \n"
-							+ src + ", Please configurate bsh.jar to classpath.",
-					e);
+							+ src
+							+ ", Please configurate bsh.jar to classpath.", e);
 		}
 
 		Interpreter bsh = new Interpreter();
 		for (String k : CacheManagerFactory.getInstance()
 
-				.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
+		.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
 
-			bsh.set(k, CacheManagerFactory.getInstance().get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA,
-					k));
+			bsh.set(k,
+					CacheManagerFactory
+							.getInstance()
+							.get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA,
+									k));
 
 		}
 
@@ -232,7 +249,8 @@ public class ObjectDigester {
 		}
 
 		if (null != CloudTestPluginFactory.getUserTransactionPlugin()) {
-			String before = CloudTestPluginFactory.class.getCanonicalName() + ".getUserTransactionPlugin().before();";
+			String before = CloudTestPluginFactory.class.getCanonicalName()
+					+ ".getUserTransactionPlugin().before();";
 			bsh.eval(before);
 		}
 
@@ -242,22 +260,46 @@ public class ObjectDigester {
 
 	private static String addEvl() {
 
-		return "Object evl(String s){return " + com.unibeta.cloudtest.util.ObjectDigester.class.getCanonicalName()
-				+ ".evl(s);}\n" + "Object eval(String s){return "
-				+ com.unibeta.cloudtest.util.ObjectDigester.class.getCanonicalName() + ".evl(s);}\n";
+		return "Object evl(String s){return "
+				+ com.unibeta.cloudtest.util.ObjectDigester.class
+						.getCanonicalName()
+				+ ".evl(s);}\n"
+				+ "Object eval(String s){return "
+				+ com.unibeta.cloudtest.util.ObjectDigester.class
+						.getCanonicalName() + ".evl(s);}\n";
 	}
 
 	private static Map<String, Object> setDefaultRuntimeData() throws EvalError {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE, CacheManagerFactory.getInstance());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE,
+				CacheManagerFactory.getInstance());
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CLOUD_OBJECT, this_);
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_ROOT_PATH, ConfigurationProxy.getCloudTestRootPath());
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_JAVA2_TEST_CASES, new Java2TestCases());
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_BEANS, CloudTestPluginFactory.getSpringBeanFactoryPlugin());
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_BEAN_FACTORY, CloudTestPluginFactory.getSpringBeanFactoryPlugin());
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_PLUGIN_CONFIG, new PluginConfigProxy());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_ROOT_PATH,
+				ConfigurationProxy.getCloudTestRootPath());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_JAVA2_TEST_CASES,
+				new Java2TestCases());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_BEANS,
+				CloudTestPluginFactory.getSpringBeanFactoryPlugin());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_BEAN_FACTORY,
+				CloudTestPluginFactory.getSpringBeanFactoryPlugin());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_PLUGIN_CONFIG,
+				new PluginConfigProxy());
+
+		try {
+			PluginConfig config = PluginConfigProxy.loadGlobalPluginConfig();
+
+			for (PluginConfig.Plugin p : config.plugin) {
+				if (p.id.startsWith("$") && p.id.endsWith("$")) {
+					map.put(p.id,
+							PluginConfigProxy.getPluginObject(p.id));
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return map;
 	}
@@ -322,16 +364,20 @@ public class ObjectDigester {
 
 			if (null != result) {
 
-				CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE, fullPath,
-						System.currentTimeMillis());
+				CacheManagerFactory.getInstance().put(
+						CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE,
+						fullPath, System.currentTimeMillis());
 
 				throw new Exception(
 						"CloudTest dynamic compiling failed, please check the java file.\nThe invalid file is located in ["
-								+ fullPath + "], compiling fatal errors were found below:\n" + result);
+								+ fullPath
+								+ "], compiling fatal errors were found below:\n"
+								+ result);
 			}
 
-			CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE, fullPath,
-					new File(fullPath).lastModified());
+			CacheManagerFactory.getInstance().put(
+					CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE,
+					fullPath, new File(fullPath).lastModified());
 
 		}
 
@@ -350,10 +396,12 @@ public class ObjectDigester {
 	private static boolean isModified(String fullPath) {
 
 		File f = new File(fullPath);
-		Object o = CacheManagerFactory.getInstance().get(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE,
-				fullPath);
+		Object o = CacheManagerFactory.getInstance()
+				.get(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE,
+						fullPath);
 
-		if (null != o && (new Long(f.lastModified()).equals(new Long(o.toString())))) {
+		if (null != o
+				&& (new Long(f.lastModified()).equals(new Long(o.toString())))) {
 			return false;
 		} else {
 			return true;
@@ -371,11 +419,14 @@ public class ObjectDigester {
 		while (f.getFilePointer() < length) {
 			String line = f.readLine();
 			// System.out.println(line);
-			if (!find && line != null && line.contains("package") && line.trim().startsWith("package")
-					&& !line.trim().startsWith("//") && line.trim().endsWith(";")) {
+			if (!find && line != null && line.contains("package")
+					&& line.trim().startsWith("package")
+					&& !line.trim().startsWith("//")
+					&& line.trim().endsWith(";")) {
 				// line = line.replace("package", "//package");
 				// find = true;
-				return line.trim().substring(7, line.trim().length() - 1).trim();
+				return line.trim().substring(7, line.trim().length() - 1)
+						.trim();
 			}
 
 			sb.append(line + "\n");

@@ -1,3 +1,12 @@
+[2019-07-08 v1.6.1]
+1. Fixed the parallel job process blocking issue when tasks count is less than servers count.
+2. Implemented runtime variables configuration via plugin. Name rules: much be starts and ends with '$', for example: 
+	<plugin id="$tools$" desc="external common tools">
+		<className>com.unibeta.cloudtest.config.plugin.tools.CommonTools</className>
+	</plugin>
+    '$tools$' can be used in runtime scripts anywhere.eg: 'tools.process(x)';
+3. Released v1.6.1
+
 [2019-04-23 v1.6.0]
 1. Enhanced com.unibeta.cloudtest.parallel.ParallelJob for api remote address injection.  
 	run(String callType,
