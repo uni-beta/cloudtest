@@ -4,7 +4,7 @@
 	<plugin id="$tools$" desc="external common tools">
 		<className>com.unibeta.cloudtest.config.plugin.tools.CommonTools</className>
 	</plugin>
-    '$tools$' can be used in runtime scripts anywhere.eg: 'tools.process(x)';
+    '$tools$' can be used in runtime scripts anywhere.eg: '$tools$.process(x)';
 3. Released v1.6.1
 
 [2019-04-23 v1.6.0]
