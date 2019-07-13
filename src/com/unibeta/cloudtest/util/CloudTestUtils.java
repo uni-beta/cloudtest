@@ -1168,6 +1168,10 @@ public class CloudTestUtils {
 	 */
 	public static List<CloudCaseInput> resolveCloudCaseInputByURIs(String caseUris) {
 		List<CloudCaseInput> list = new ArrayList<CloudCaseInput>();
+		
+		if(CommonUtils.isNullOrEmpty(caseUris)) {
+			return list;
+		}
 
 		String[] uris = null;
 
