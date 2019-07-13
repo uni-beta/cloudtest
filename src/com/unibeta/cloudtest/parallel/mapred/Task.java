@@ -15,13 +15,22 @@ public class Task {
     public static Integer STATUS_REJECTED = 5;
 
     private String caseUri;
+    private String[] caseId;
     private int status = 0;
     private String owner;
     private List<String> historyOwners = new ArrayList<String>();
     private long blockSize;
     private String message;
 
-    public String getMessage() {
+    public String[] getCaseId() {
+		return caseId;
+	}
+
+	public void setCaseId(String[] caseId) {
+		this.caseId = caseId;
+	}
+
+	public String getMessage() {
 		return message;
 	}
 

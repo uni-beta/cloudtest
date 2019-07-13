@@ -50,7 +50,7 @@ public class CloudTestLinkedServiceExecutor implements Runnable {
                 server.setCurrentTask(task);
 
                 input.setFileName(LocalParallelJobUtil.wrapWithToken(task.getCaseUri()));
-
+                input.setCaseId(task.getCaseId());
                 task.setStatus(Task.STATUS_INPROCESS);
             }
 

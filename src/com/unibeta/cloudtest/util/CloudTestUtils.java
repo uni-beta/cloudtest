@@ -22,6 +22,7 @@ import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -56,6 +57,7 @@ import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
 import org.springframework.aop.framework.Advised;
 
+import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.CloudTestOutput.ResultStatistics;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
@@ -1130,6 +1132,100 @@ public class CloudTestUtils {
 
 		return org.apache.xerces.impl.dv.util.Base64.encode(digest.digest(request));
 
+	}
+
+	/**
+	 * Gets uniformed case uri, for example: <br>
+	 * input case file full path
+	 * "d:/cloud_test/cloudtest/TestCase/aaa/bbb/ccc.tc.xml"<br>
+	 * return case uri as "TestCase/aaa/bbb/ccc.tc.xml"<br>
+	 * 
+	 * @param str
+	 * @return "TestCase/aaa/bbb/ccc.tc.xml"
+	 */
+	public static String getContextedURI(String str) {
+
+		String replacedRootPath = ConfigurationProxy.getCloudTestRootPath().replace("\\", "/");
+
+		int i = str.replace("\\", "/").indexOf(replacedRootPath);
+
+		if (i < 0) {
+			return str.replace("\\", "/");
+		} else {
+			return str.substring(i + replacedRootPath.length()).replace("\\", "/");
+		}
+
+	}
+
+	/**
+	 * Resolves case uri to CloudCaseInput list.
+	 * 
+	 * @param caseUri
+	 *            expressed as
+	 *            "D:\\eclipse\\cloudtest\\test\TestCase\abc.tc.xml@[case1,case2,case3]",uris
+	 *            is separated by ";" for multiple case files.
+	 * @return list of CloudCaseInput with caseId and fileName
+	 */
+	public static List<CloudCaseInput> resolveCloudCaseInputByURIs(String caseUris) {
+		List<CloudCaseInput> list = new ArrayList<CloudCaseInput>();
+
+		String[] uris = null;
+
+		if (caseUris.indexOf("@[") > 0 && caseUris.indexOf("]") > 0) {
+			uris = caseUris.split(";");
+		} else {
+			uris = caseUris.split(",");
+			if (uris.length <= 1) {
+				uris = caseUris.split(";");
+			}
+		}
+
+		for (String uri : uris) {
+			CloudCaseInput input = new CloudCaseInput();
+			String[] exps = uri.split("@\\[");
+
+			input.setFileName(exps[0]);
+
+			String[] caseIds = null;
+			if (exps.length == 2) {
+				String exp1 = exps[1].trim();
+				if (exp1.endsWith("]")) {
+					exp1 = exp1.substring(0, exp1.length() - 1);
+				}
+
+				caseIds = exp1.split(",");
+				int i = 0;
+				for (String s : caseIds) {
+					caseIds[i++] = s.trim();
+				}
+
+				input.setCaseId(caseIds);
+			}
+
+			list.add(input);
+		}
+
+		Map<String, CloudCaseInput> m = new HashMap<String, CloudCaseInput>();
+		for (CloudCaseInput i : list) {
+			if (m.get(i.getFileName()) == null) {
+				m.put(i.getFileName(), i);
+			} else {
+				CloudCaseInput in = m.get(i.getFileName());
+				List<String> l = new ArrayList<String>();
+
+				l.addAll(Arrays.asList(i.getCaseId()));
+				l.addAll(Arrays.asList(in.getCaseId()));
+
+				String[] newIds = l.toArray(new String[0]);
+				in.setCaseId(newIds);
+
+				m.put(i.getFileName(), in);
+			}
+		}
+
+		list.clear();
+		list.addAll(m.values());
+		return list;
 	}
 
 }

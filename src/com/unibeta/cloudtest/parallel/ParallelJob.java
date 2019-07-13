@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.TestService;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
@@ -112,12 +113,24 @@ public class ParallelJob {
 			// serverMap.put("localhost", new CloudTestService());
 
 			Map<String, Task> taskMap = new LinkedHashMap<String, Task>();
-			String[] uris = caseUris.split(",");
+			List<CloudCaseInput> inputs = CloudTestUtils.resolveCloudCaseInputByURIs(caseUris);
 
-			for (String uri : uris) {
-				String caseFilePath = ConfigurationProxy.getCloudTestRootPath() + uri;
+			for (CloudCaseInput in : inputs) {
+				String caseFilePath = ConfigurationProxy.getCloudTestRootPath() + in.getFileName();
 				taskMap.putAll(JobMapReducer.map(caseFilePath));
+				
+				if (taskMap.get(CloudTestUtils.getContextedURI(caseFilePath)) != null) {
+					taskMap.get(CloudTestUtils.getContextedURI(caseFilePath)).setCaseId(in.getCaseId());
+				}
 			}
+
+			/*
+			 * String[] uris = caseUris.split(",");
+			 * 
+			 * for (String uri : uris) { String caseFilePath =
+			 * ConfigurationProxy.getCloudTestRootPath() + uri;
+			 * taskMap.putAll(JobMapReducer.map(caseFilePath)); }
+			 */
 
 			Map<String, Server> servers_ = RemoteParallelUtil.wrapToServer(serverMap);
 

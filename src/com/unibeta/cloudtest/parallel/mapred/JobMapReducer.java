@@ -34,7 +34,7 @@ public class JobMapReducer {
 
         File file = new File(filePath);
         if (file.isFile()) {
-            String id = getContextedURI(filePath);
+            String id = CloudTestUtils.getContextedURI(filePath);
             Task t = new Task();
 
             t.setId(id);
@@ -65,7 +65,7 @@ public class JobMapReducer {
 
             if (!checkContains(map, str)) {
 
-                String id = getContextedURI(str);
+                String id = CloudTestUtils.getContextedURI(str);
 
                 Task t = new Task();
 
@@ -101,22 +101,7 @@ public class JobMapReducer {
         return parent;
     }
 
-    private static String getContextedURI(String str) {
-
-        int i = str.replace("\\", "/").indexOf(
-                ConfigurationProxy.getCloudTestRootPath().replace("\\", "/"));
-        if (i < 0) {
-            i = 0;
-        }
-
-        String id = str.substring(
-                i
-                        + ConfigurationProxy.getCloudTestRootPath()
-                                .replace("\\", "/").length())
-                .replace("\\", "/");
-        return id;
-    }
-
+   
     private static long calculateBlockSize(String caseUri) {
 
         List<String> fileList = CloudTestUtils

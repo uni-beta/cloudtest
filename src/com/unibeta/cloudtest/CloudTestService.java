@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -611,16 +613,22 @@ public class CloudTestService implements TestService {
 
 		}
 
-		String[] fileNames = input.getFileName().split(",");
-		String[] caseIds = input.getCaseId();
-
+		/*String[] fileNames = input.getFileName().split(",");
+		String[] caseIds = input.getCaseId();*/
+		
+		List<CloudCaseInput> inputs = CloudTestUtils.resolveCloudCaseInputByURIs(input.getFileName());
+		
 		List<String> filePathList = new ArrayList<String>();
 		List<CloudTestOutput> outputList = new ArrayList<CloudTestOutput>();
 		Boolean isDirectory = false;
+		Map<String,String[]> caseIdMap = new HashMap<String,String[]>();
+		
+		for (CloudCaseInput caseInput : inputs) {
 
-		for (String fileName : fileNames) {
-
-			if (CommonUtils.isNullOrEmpty(fileName)) {
+			String fileName = caseInput.getFileName();
+			caseIdMap.put(CloudTestUtils.getContextedURI(fileName), caseInput.getCaseId());
+			
+			if (CommonUtils.isNullOrEmpty(fileName )) {
 				continue;
 			} else {
 				fileName = fileName.trim();
@@ -666,6 +674,8 @@ public class CloudTestService implements TestService {
 				CloudTestCase cloudTestCase = null;
 
 				try {
+					String[] caseIds = caseIdMap.get(CloudTestUtils.getContextedURI(filePath));
+					
 					if (isDirectory) {
 						caseIds = null;
 					}

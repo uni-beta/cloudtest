@@ -42,6 +42,7 @@ public class CloudTestSingleServiceExecutor extends Thread implements Runnable {
 
         // super.setName(task.getOwner());
         this.fileName = task.getCaseUri();
+        this.caseId = task.getCaseId();
         this.testService = server.getTestService();
 
     }

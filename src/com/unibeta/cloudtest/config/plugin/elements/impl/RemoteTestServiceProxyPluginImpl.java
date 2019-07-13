@@ -179,7 +179,7 @@ public class RemoteTestServiceProxyPluginImpl implements
                     + id
                     + ", address = "
                     + address
-                    + "] is not accessible. Prapallel job will ignore this slave server node. Caused by "
+                    + "] is not accessible. Parallel job will ignore this slave server node. Caused by "
                     + e.getMessage();
             log.warn(errorMsg);
             throw new Exception(errorMsg);
