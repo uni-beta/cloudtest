@@ -12,6 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.unibeta.cloudtest.CloudCaseInput;
@@ -118,9 +119,12 @@ public class ParallelJob {
 			for (CloudCaseInput in : inputs) {
 				String caseFilePath = ConfigurationProxy.getCloudTestRootPath() + in.getFileName();
 				taskMap.putAll(JobMapReducer.map(caseFilePath));
-				
-				if (taskMap.get(CloudTestUtils.getContextedURI(caseFilePath)) != null) {
-					taskMap.get(CloudTestUtils.getContextedURI(caseFilePath)).setCaseId(in.getCaseId());
+
+				Task task = taskMap.get(CloudTestUtils.getContextedURI(caseFilePath));
+				if (task != null) {
+					task.setCaseId(in.getCaseId());
+					task.setId(CloudTestUtils.getContextedURI(caseFilePath) + "@["
+							+ StringUtils.join(in.getCaseId(), ",") + "]");
 				}
 			}
 
