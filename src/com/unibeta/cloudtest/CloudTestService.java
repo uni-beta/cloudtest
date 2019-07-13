@@ -678,6 +678,8 @@ public class CloudTestService implements TestService {
 					
 					if (isDirectory) {
 						caseIds = null;
+					}else {
+						caseIds = input.getCaseId();
 					}
 
 					// get input list by fileName and caseIds
