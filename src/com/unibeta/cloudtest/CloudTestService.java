@@ -682,7 +682,7 @@ public class CloudTestService implements TestService {
 					if (isDirectory) {
 						caseIds = null;
 					} else if (null != input.getCaseId() && input.getCaseId().length > 0
-							&& !Arrays.asList(new String[] { "?", null }).contains(input.getCaseId()[0])) {
+							&& !Arrays.asList(new String[] { null, "", "?" }).contains(input.getCaseId()[0])) {
 						caseIds = input.getCaseId();
 					}
 
