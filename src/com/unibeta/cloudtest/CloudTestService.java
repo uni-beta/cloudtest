@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -613,22 +614,24 @@ public class CloudTestService implements TestService {
 
 		}
 
-		/*String[] fileNames = input.getFileName().split(",");
-		String[] caseIds = input.getCaseId();*/
-		
+		/*
+		 * String[] fileNames = input.getFileName().split(","); String[] caseIds =
+		 * input.getCaseId();
+		 */
+
 		List<CloudCaseInput> inputs = CloudTestUtils.resolveCloudCaseInputByURIs(input.getFileName());
-		
+
 		List<String> filePathList = new ArrayList<String>();
 		List<CloudTestOutput> outputList = new ArrayList<CloudTestOutput>();
 		Boolean isDirectory = false;
-		Map<String,String[]> caseIdMap = new HashMap<String,String[]>();
-		
+		Map<String, String[]> caseIdMap = new HashMap<String, String[]>();
+
 		for (CloudCaseInput caseInput : inputs) {
 
 			String fileName = caseInput.getFileName();
 			caseIdMap.put(CloudTestUtils.getContextedURI(fileName), caseInput.getCaseId());
-			
-			if (CommonUtils.isNullOrEmpty(fileName )) {
+
+			if (CommonUtils.isNullOrEmpty(fileName)) {
 				continue;
 			} else {
 				fileName = fileName.trim();
@@ -675,10 +678,11 @@ public class CloudTestService implements TestService {
 
 				try {
 					String[] caseIds = caseIdMap.get(CloudTestUtils.getContextedURI(filePath));
-					
+
 					if (isDirectory) {
 						caseIds = null;
-					}else {
+					} else if (null != input.getCaseId() && input.getCaseId().length > 0
+							&& !Arrays.asList(new String[] { "?", null }).contains(input.getCaseId()[0])) {
 						caseIds = input.getCaseId();
 					}
 
