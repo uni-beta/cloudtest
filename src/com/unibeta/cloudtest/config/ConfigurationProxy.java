@@ -28,6 +28,7 @@ public class ConfigurationProxy {
 
     private static String CLOUDTEST_HOME;
     private static String rootFolderName = "cloudtest";
+    private static boolean homePathWarningLogged = false;
 
     private static Logger logger = Logger.getLogger(ConfigurationProxy.class);
     @SuppressWarnings("unused")
@@ -222,7 +223,11 @@ public class ConfigurationProxy {
                 CLOUDTEST_HOME = new CLOUDTEST_HOME$PathProviderImpl()
                         .getCLOUDTEST_HOME();
             } catch (Exception e) {
-                logger.error(e.getMessage(), e.getCause());
+            	if (!homePathWarningLogged) {
+            		logger.warn(e.getMessage());
+    				homePathWarningLogged = true;
+    			}
+                
                 return null;
             }
 
