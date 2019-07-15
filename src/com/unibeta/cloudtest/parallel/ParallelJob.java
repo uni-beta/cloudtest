@@ -123,8 +123,10 @@ public class ParallelJob {
 				Task task = taskMap.get(CloudTestUtils.getContextedURI(caseFilePath));
 				if (task != null) {
 					task.setCaseId(in.getCaseId());
-					task.setId(CloudTestUtils.getContextedURI(caseFilePath) + "@["
-							+ StringUtils.join(in.getCaseId(), ",") + "]");
+					if (null != in.getCaseId() && in.getCaseId().length > 0) {
+						task.setId(CloudTestUtils.getContextedURI(caseFilePath) + "@["
+								+ StringUtils.join(in.getCaseId(), ",") + "]");
+					}
 				}
 			}
 
