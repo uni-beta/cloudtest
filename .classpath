@@ -180,6 +180,6 @@
 	<classpathentry kind="lib" path="lib/org.aspectj.matcher.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.3.3.jar"/>
-	<classpathentry kind="lib" path="lib/vRules4j-3.3.5.b201905300934PM.jar"/>
+	<classpathentry kind="lib" path="lib/vRules4j-3.3.6.b201907251012PM.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
