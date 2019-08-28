@@ -20,244 +20,242 @@ import com.unibeta.vrules.utils.CommonUtils;
  */
 public class CloudTestReportor {
 
-    private static final String DEFAULT_TEST_CASE_PATH = "TestCase/";
-    private static Logger log = Logger.getLogger(CloudTestReportor.class);
+	private static final String DEFAULT_TEST_CASE_PATH = "TestCase/";
+	private static Logger log = Logger.getLogger(CloudTestReportor.class);
 
-    // private XStream ObjectDigester = new XStream(new DomDriver());
+	// private XStream ObjectDigester = new XStream(new DomDriver());
 
-    /**
-     * It will execute specified test case under given folder or file and send
-     * the result via email.
-     * 
-     * @param moduleName
-     *            module name
-     * @param caseFileName
-     *            the specified test case folder to be executed.
-     * @param toMailsAddress
-     *            the mail address to be sent
-     * @param reportFolderName
-     *            The report location folder name, it will be "default" if it is
-     *            null or blank.
-     * @return the test result
-     * @throws Exception
-     */
-    public static CloudTestOutput report(String moduleName,
-            String caseFileName, String toMailsAddress, String reportFolderName) {
+	/**
+	 * It will execute specified test case under given folder or file and send
+	 * the result via email.
+	 * 
+	 * @param moduleName
+	 *            module name
+	 * @param caseFileName
+	 *            the specified test case folder to be executed.
+	 * @param toMailsAddress
+	 *            the mail address to be sent
+	 * @param reportFolderName
+	 *            The report location folder name, it will be "default" if it is
+	 *            null or blank.
+	 * @return the test result
+	 * @throws Exception
+	 */
+	public static CloudTestOutput report(String moduleName,
+			String caseFileName, String toMailsAddress, String reportFolderName) {
 
-        CloudTestOutput cloudTestOutput = null;
-        CloudCaseInput input = new CloudCaseInput();
+		CloudTestOutput cloudTestOutput = null;
+		CloudCaseInput input = new CloudCaseInput();
 
-        if (null == caseFileName || caseFileName.length() == 0) {
-            caseFileName = DEFAULT_TEST_CASE_PATH;
-        }
+		if (null == caseFileName || caseFileName.length() == 0) {
+			caseFileName = DEFAULT_TEST_CASE_PATH;
+		}
 
-        input.setFileName(caseFileName);
-        input.setCaseId(null);
+		input.setFileName(caseFileName);
+		input.setCaseId(null);
 
-        cloudTestOutput = new CloudTestService().doTest(input);
-        cloudTestOutput = buildReport(moduleName, cloudTestOutput,
-                toMailsAddress, reportFolderName);
+		cloudTestOutput = new CloudTestService().doTest(input);
+		cloudTestOutput = buildReport(moduleName, cloudTestOutput,
+				toMailsAddress, reportFolderName);
 
-        return cloudTestOutput;
+		return cloudTestOutput;
 
-    }
+	}
 
-    /**
-     * It will execute specified test case under given folder or file and send
-     * the result via email.
-     * 
-     * @param moduleName
-     *            module name
-     * @param caseFileName
-     *            the specified test case folder to be executed.
-     * @param toMailsAddress
-     *            the mail address to be sent
-     * @return the test result
-     * @throws Exception
-     */
-    public static CloudTestOutput report(String moduleName,
-            String caseFileName, String toMailsAddress) {
+	/**
+	 * It will execute specified test case under given folder or file and send
+	 * the result via email.
+	 * 
+	 * @param moduleName
+	 *            module name
+	 * @param caseFileName
+	 *            the specified test case folder to be executed.
+	 * @param toMailsAddress
+	 *            the mail address to be sent
+	 * @return the test result
+	 * @throws Exception
+	 */
+	public static CloudTestOutput report(String moduleName,
+			String caseFileName, String toMailsAddress) {
 
-        return report(moduleName, caseFileName, toMailsAddress, null);
-    }
+		return report(moduleName, caseFileName, toMailsAddress, null);
+	}
 
-    private static CloudTestOutput buildReport(String moduleName,
-            CloudTestOutput cloudTestOutput, String toMailsAddress,
-            String reportFolderName) {
+	private static CloudTestOutput buildReport(String moduleName,
+			CloudTestOutput cloudTestOutput, String toMailsAddress,
+			String reportFolderName) {
 
-        try {
-            String subject = moduleName + "Cloud Test Report@" + new Date();
-            String userName = System.getProperty("user.name");
+		try {
+			String subject = moduleName + "Cloud Test Report@" + new Date();
+			String userName = System.getProperty("user.name");
 
-            if (!CommonUtils.isNullOrEmpty(userName)) {
-                subject = subject + " From " + userName;
-            }
+			if (!CommonUtils.isNullOrEmpty(userName)) {
+				subject = subject + " From " + userName;
+			}
 
-            sendReport(toMailsAddress, subject, cloudTestOutput,
-                    reportFolderName);
-        } catch (Exception e) {
+			sendReport(toMailsAddress, subject, cloudTestOutput,
+					reportFolderName);
+		} catch (Exception e) {
 
-            cloudTestOutput.setStatus(false);
-            cloudTestOutput.setErrorMessage("Cloud Report Error: "
-                    + e.getMessage() + " \n "
-                    + cloudTestOutput.getErrorMessage() + "\n"
-                    + CloudTestUtils.printExceptionStackTrace(e));
+			cloudTestOutput.setStatus(false);
+			cloudTestOutput.setErrorMessage("Cloud Report Error: "
+					+ e.getMessage() + " \n "
+					+ cloudTestOutput.getErrorMessage() + "\n"
+					+ CloudTestUtils.printExceptionStackTrace(e));
 
-            log.error(cloudTestOutput.getErrorMessage(), e);
-        }
-        return cloudTestOutput;
-    }
+			log.error(cloudTestOutput.getErrorMessage(), e);
+		}
+		return cloudTestOutput;
+	}
 
-    /**
-     * It will execute specified load test service under given folder or file
-     * and send the result via email.
-     * 
-     * @param moduleName
-     *            module name
-     * @param cloudLoadInput
-     *            the specified load test case to be executed.
-     * @param toMailsAddress
-     *            the mail address to be sent
-     * @return the test result
-     * @throws Exception
-     */
-    public static CloudTestOutput report(String moduleName,
-            CloudLoadInput cloudLoadInput, String toMailsAddress) {
+	/**
+	 * It will execute specified load test service under given folder or file
+	 * and send the result via email.
+	 * 
+	 * @param moduleName
+	 *            module name
+	 * @param cloudLoadInput
+	 *            the specified load test case to be executed.
+	 * @param toMailsAddress
+	 *            the mail address to be sent
+	 * @return the test result
+	 * @throws Exception
+	 */
+	public static CloudTestOutput report(String moduleName,
+			CloudLoadInput cloudLoadInput, String toMailsAddress) {
 
-        return report(moduleName, cloudLoadInput, toMailsAddress, "load");
-    }
+		return report(moduleName, cloudLoadInput, toMailsAddress, "load");
+	}
 
-    /**
-     * It will execute specified load test service under given folder or file
-     * and send the result via email.
-     * 
-     * @param moduleName
-     *            module name
-     * @param cloudLoadInput
-     *            the specified load test case to be executed.
-     * @param toMailsAddress
-     *            the mail address to be sent
-     * @param reportFolderName
-     *            if it is null or blank, it will be located in 'load' by
-     *            default.
-     * @return the test result
-     * @throws Exception
-     */
-    public static CloudTestOutput report(String moduleName,
-            CloudLoadInput cloudLoadInput, String toMailsAddress,
-            String reportFolderName) {
+	/**
+	 * It will execute specified load test service under given folder or file
+	 * and send the result via email.
+	 * 
+	 * @param moduleName
+	 *            module name
+	 * @param cloudLoadInput
+	 *            the specified load test case to be executed.
+	 * @param toMailsAddress
+	 *            the mail address to be sent
+	 * @param reportFolderName
+	 *            if it is null or blank, it will be located in 'load' by
+	 *            default.
+	 * @return the test result
+	 * @throws Exception
+	 */
+	public static CloudTestOutput report(String moduleName,
+			CloudLoadInput cloudLoadInput, String toMailsAddress,
+			String reportFolderName) {
 
-        CloudTestOutput cloudTestOutput = null;
-        if (CommonUtils.isNullOrEmpty(moduleName)) {
-            moduleName = "";
-        }
+		CloudTestOutput cloudTestOutput = null;
+		if (CommonUtils.isNullOrEmpty(moduleName)) {
+			moduleName = "";
+		}
 
-        cloudTestOutput = new CloudTestService().doLoadTest(cloudLoadInput);
-        cloudTestOutput = buildReport(moduleName + "[LoadTest]",
-                cloudTestOutput, toMailsAddress, reportFolderName);
+		cloudTestOutput = new CloudTestService().doLoadTest(cloudLoadInput);
+		cloudTestOutput = buildReport(moduleName + "[LoadTest]",
+				cloudTestOutput, toMailsAddress, reportFolderName);
 
-        return cloudTestOutput;
-    }
+		return cloudTestOutput;
+	}
 
-    /**
-     * Generates the report file under 'reportFolderName' folder, and Send
-     * <code>CloudTestOutput</code> to mail report.
-     * 
-     * @param toMailsAddress
-     *            mail address, split with ';' for multiple email addresses.
-     * @param subject
-     *            mail subject
-     * @param cloudTestOutput
-     * @param reportFolderName
-     *            if it is null or blank, it will be located in 'default' by
-     *            default.
-     * @throws Exception
-     */
-    public static void sendReport(String toMailsAddress, String subject,
-            CloudTestOutput cloudTestOutput, String reportFolderName)
-            throws Exception {
+	/**
+	 * Generates the report file under 'reportFolderName' folder, and Send
+	 * <code>CloudTestOutput</code> to mail report.
+	 * 
+	 * @param toMailsAddress
+	 *            mail address, split with ';' for multiple email addresses.
+	 * @param subject
+	 *            mail subject
+	 * @param cloudTestOutput
+	 * @param reportFolderName
+	 *            if it is null or blank, it will be located in 'default' by
+	 *            default.
+	 * @throws Exception
+	 */
+	public static void sendReport(String toMailsAddress, String subject,
+			CloudTestOutput cloudTestOutput, String reportFolderName)
+			throws Exception {
 
-        try {
-            if (null != cloudTestOutput) {
-                int priority = generatePriority(cloudTestOutput);
+		int priority = MailManager.MAIL_PRIORITY_NORMAL;
+		ReportGeneratorPlugin.ReportResult generateReport = null;
 
-                ReportGeneratorPlugin generatorPlugin = CloudTestPluginFactory
-                        .getReportGeneratorPlugin();
+		if (null != cloudTestOutput) {
+			priority = generatePriority(cloudTestOutput);
 
-                generatorPlugin.setReportFolderName(reportFolderName);
-                ReportGeneratorPlugin.ReportResult generateReport = generatorPlugin
-                        .generateReport(cloudTestOutput);
-                if (null == generateReport) {
-                    generateReport = new ReportGeneratorPlugin.ReportResult();
-                }
+			ReportGeneratorPlugin generatorPlugin = CloudTestPluginFactory
+					.getReportGeneratorPlugin();
 
-                if (!CommonUtils.isNullOrEmpty(toMailsAddress)) {
-                    MailManager.sendMail(toMailsAddress, subject,
-                            generateReport.getContent(),
-                            generateReport.getDataResources(), true, priority);
-                }
-            }
-            // else {
-            // MailManager.sendMail(
-            // toMailsAddress,
-            // subject,
-            // "Cloud test failure caused by:<br> <pre>"
-            // + StringEscapeUtils.escapeXml(ObjectDigester
-            // .toXML(cloudTestOutput)) + "</pre>",
-            // true, MailManager.MAIL_PRIORITY_HIGHEST);
-            // }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw e;
-        }
-    }
+			generatorPlugin.setReportFolderName(reportFolderName);
+			generateReport = generatorPlugin.generateReport(cloudTestOutput);
+			if (null == generateReport) {
+				generateReport = new ReportGeneratorPlugin.ReportResult();
+			}
+		}
 
-    /**
-     * It will execute specified test case under given folder or file and send
-     * the result via email.
-     * 
-     * @param caseFileName
-     *            the specified test case folder to be executed.
-     * @param toMailsAddress
-     *            the mail address to be sent
-     * @return the test result
-     * @throws Exception
-     */
-    public static CloudTestOutput report(String caseFileName,
-            String toMailsAddress) {
+		try {
+			if (!CommonUtils.isNullOrEmpty(toMailsAddress)
+					&& generateReport != null) {
+				log.info("start sending mail...");
+				
+				long start = System.currentTimeMillis();
+				MailManager.sendMail(toMailsAddress, subject,
+						generateReport.getContent(),
+						generateReport.getDataResources(), true, priority);
+				long end = System.currentTimeMillis();
+				
+				log.info("mail sending success in " + (end-start)/1000.00 + "s");
+			}
+		} catch (Exception e) {
+			log.error("mail sending failed, caused by " + e.getMessage(), e);
+		}
+	}
 
-        return report("", caseFileName, toMailsAddress);
-    }
+	/**
+	 * It will execute specified test case under given folder or file and send
+	 * the result via email.
+	 * 
+	 * @param caseFileName
+	 *            the specified test case folder to be executed.
+	 * @param toMailsAddress
+	 *            the mail address to be sent
+	 * @return the test result
+	 * @throws Exception
+	 */
+	public static CloudTestOutput report(String caseFileName,
+			String toMailsAddress) {
 
-    private static int generatePriority(CloudTestOutput cloudTestOutput) {
+		return report("", caseFileName, toMailsAddress);
+	}
 
-        if (null == cloudTestOutput
-                || null == cloudTestOutput.getTestCaseResults()) {
-            return MailManager.MAIL_PRIORITY_HIGHEST;
-        }
+	private static int generatePriority(CloudTestOutput cloudTestOutput) {
 
-        for (CloudTestOutput o : cloudTestOutput.getTestCaseResults()) {
-            if (o.getStatus() != null && !o.getStatus()) {
-                return MailManager.MAIL_PRIORITY_HIGH;
-            }
-        }
+		if (null == cloudTestOutput
+				|| null == cloudTestOutput.getTestCaseResults()) {
+			return MailManager.MAIL_PRIORITY_HIGHEST;
+		}
 
-        return MailManager.MAIL_PRIORITY_NORMAL;
-    }
+		for (CloudTestOutput o : cloudTestOutput.getTestCaseResults()) {
+			if (o.getStatus() != null && !o.getStatus()) {
+				return MailManager.MAIL_PRIORITY_HIGH;
+			}
+		}
 
-    /**
-     * Generate the report file under default folder and send the email to
-     * specified mail addresses.
-     * 
-     * @param toMailsAddress
-     * @param subject
-     * @param cloudTestOutput
-     * @throws Exception
-     */
-    public static void sendReport(String toMailsAddress, String subject,
-            CloudTestOutput cloudTestOutput) throws Exception {
+		return MailManager.MAIL_PRIORITY_NORMAL;
+	}
 
-        sendReport(toMailsAddress, subject, cloudTestOutput, null);
-    }
+	/**
+	 * Generate the report file under default folder and send the email to
+	 * specified mail addresses.
+	 * 
+	 * @param toMailsAddress
+	 * @param subject
+	 * @param cloudTestOutput
+	 * @throws Exception
+	 */
+	public static void sendReport(String toMailsAddress, String subject,
+			CloudTestOutput cloudTestOutput) throws Exception {
+
+		sendReport(toMailsAddress, subject, cloudTestOutput, null);
+	}
 }

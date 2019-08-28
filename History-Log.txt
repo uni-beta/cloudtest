@@ -7,7 +7,8 @@
     '$tools$' can be used in runtime scripts anywhere.eg: '$tools$.process(x)';
 3. Enhanced case fileName to indicate caseId with '@[,,]', for example:
    'TestCase/mytest/test1.tc.xml@[case1,case2,case3];TestCase/mytest/test2.tc.xml@[case11,case21,case31];'
-4. Released v1.6.1
+4. Refined mail sending timeout logic.
+5. Released v1.6.1
 
 [2019-04-23 v1.6.0]
 1. Enhanced com.unibeta.cloudtest.parallel.ParallelJob for api remote address injection.  

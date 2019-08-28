@@ -52,6 +52,10 @@
 	<param name="cloudtest.mail.Pop3Port" value="995"/>
 	<param name="cloudtest.mail.StoreProtocal" value="pop3s"/>
 	<param name="cloudtest.mail.smtp.auth" value="false"/>
+	<param name="cloudtest.mail.smtp.connectiontimeout" value="60000" />
+    <param name="cloudtest.mail.smtp.timeout" value="60000" />
+    <param name="cloudtest.mail.smtp.writetimeout" value="60000" />
+	
 	<param name="cloudtest.mailservice.DeployedServerName" value="computer name"/>
 	<param name="cloudtest.loadtest.MaxDetailedResponseAmount" value="100000"/>
 
