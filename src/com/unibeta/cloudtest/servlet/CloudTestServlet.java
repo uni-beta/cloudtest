@@ -188,7 +188,7 @@ public class CloudTestServlet extends HttpServlet {
 			if (!CommonUtils.isNullOrEmpty(className)) {
 
 				className = className.trim();
-				configPathServicePlugin = (CLOUDTEST_HOME$PathProvider) Class.forName(className).newInstance();
+				configPathServicePlugin = (CLOUDTEST_HOME$PathProvider) Thread.currentThread().getContextClassLoader().loadClass(className).newInstance();
 
 				ConfigurationProxy.setCLOUDTEST_HOME(configPathServicePlugin.getCLOUDTEST_HOME().trim());
 			}

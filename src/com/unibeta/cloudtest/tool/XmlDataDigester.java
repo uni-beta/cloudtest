@@ -113,7 +113,7 @@ public class XmlDataDigester {
 
 		Class clazz;
 		try {
-			clazz = Class.forName(className);
+			clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
 			if (rootNode && clazz.isInterface()) {
 				List<Class> impls = CloudTestUtils.findImplementations(clazz,
 						new String[] { CloudTestUtils
@@ -438,7 +438,7 @@ public class XmlDataDigester {
 
 		Class<?> type = null;
 		try {
-			type = Class.forName(clazz);
+			type = Thread.currentThread().getContextClassLoader().loadClass(clazz);
 		} catch (ClassNotFoundException e) {
 			type = CloudTestUtils.evalDataType(clazz);
 		}

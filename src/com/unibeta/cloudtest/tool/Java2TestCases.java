@@ -128,7 +128,7 @@ public class Java2TestCases {
         List<Case> cases = new ArrayList<Case>();
 
         try {
-            Class clazz = Class.forName(className);
+            Class clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
             Method[] methods = getMethods(clazz, accessLevel);
 
             if (methods == null || methods.length == 0) {
@@ -394,7 +394,7 @@ public class Java2TestCases {
                 // }
                 Class c;
                 try {
-                    c = Class.forName(type);
+                    c = Thread.currentThread().getContextClassLoader().loadClass(type);
                 } catch (Exception e) {
                     type = type.replace("[]", ARRAY_TYPE_TAG);
                     Object o = ObjectDigester.fromXML("<" + type + ">0</"

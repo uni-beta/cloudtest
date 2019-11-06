@@ -203,8 +203,9 @@ public class PluginConfigProxy {
 			if (!CommonUtils.isNullOrEmpty(e.className)
 					&& !CommonUtils.isNullOrEmpty(e.id)) {
 				try {
-					Class implementation = Class.forName(e.className.trim());
-					Class defination = Class.forName(e.id.trim());
+					Thread.currentThread().getContextClassLoader().loadClass(e.className.trim());
+					Class implementation = Thread.currentThread().getContextClassLoader().loadClass(e.className.trim());
+					Class defination = Thread.currentThread().getContextClassLoader().loadClass(e.id.trim());
 
 					if (!defination.isAssignableFrom(implementation)) {
 						throw new Exception("given plguin '" + e.id
@@ -216,7 +217,7 @@ public class PluginConfigProxy {
 						if (newInstance instanceof CloudTestPlugin) {
 							cloudTestPluginInstancesMap.put((e.id),
 									(CloudTestPlugin) newInstance);
-						} else {
+						} else { 
 							throw new Exception("given "
 									+ implementation.getName()
 									+ " Plugin component have to extends '"

@@ -713,7 +713,7 @@ public class CloudTestUtils {
 		Object o = null;
 
 		try {
-			clazz = Class.forName(className);
+			clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
 			return clazz;
 		} catch (ClassNotFoundException e) {
 			log.debug(e.getMessage());

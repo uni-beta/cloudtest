@@ -1336,7 +1336,7 @@ public class CloudTestService implements TestService {
 		}
 
 		// try {
-		// Class.forName("bsh.Interpreter");
+		// Thread.currentThread().getContextClassLoader().loadClass("bsh.Interpreter");
 		//
 		// Interpreter bsh = new Interpreter();
 		// bsh.set(name, null);
@@ -1384,7 +1384,7 @@ public class CloudTestService implements TestService {
 		for (String ast : asserts) {
 			boolean has = true;
 			try {
-				Class.forName(ast);
+				Thread.currentThread().getContextClassLoader().loadClass(ast);
 			} catch (ClassNotFoundException e) {
 				has = false;
 			}
@@ -1588,7 +1588,7 @@ public class CloudTestService implements TestService {
 
 				try {
 					// get object by bean factory
-					Class.forName("org.springframework.beans.factory.BeanFactory");
+					Thread.currentThread().getContextClassLoader().loadClass("org.springframework.beans.factory.BeanFactory");
 
 					BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
@@ -1597,7 +1597,7 @@ public class CloudTestService implements TestService {
 				} catch (Exception e) {
 					// get class by className
 					try {
-						c = Class.forName(className);
+						c = Thread.currentThread().getContextClassLoader().loadClass(className);
 					} catch (ClassNotFoundException e1) {
 						try {
 							boolean isXmlData = xmlValuePattern.matcher(className).find();
@@ -1787,7 +1787,7 @@ public class CloudTestService implements TestService {
 
 			try {
 				// get object by bean factory
-				Class springClass = Class.forName("org.springframework.beans.factory.BeanFactory");
+				Class springClass = Thread.currentThread().getContextClassLoader().loadClass("org.springframework.beans.factory.BeanFactory");
 
 				BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
@@ -1796,7 +1796,7 @@ public class CloudTestService implements TestService {
 			} catch (Exception e) {
 				// get class by className
 				try {
-					clazz = Class.forName(className);
+					clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
 				} catch (Exception e1) {
 					Object fromJava = ObjectDigester.fromJava(className);
 					if (null != fromJava) {
@@ -1826,7 +1826,7 @@ public class CloudTestService implements TestService {
 		} else {
 			Object o = null;
 			try {
-				clazz = Class.forName(name);
+				clazz = Thread.currentThread().getContextClassLoader().loadClass(name);
 			} catch (Exception e) {
 
 				clazz = CloudTestUtils.evalDataType(name);

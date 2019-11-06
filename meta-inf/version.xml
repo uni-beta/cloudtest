@@ -1,6 +1,6 @@
 <version>
 	<project-name>cloudtest</project-name>
-	<version-number>cloudtest-1.4.3</version-number>
+	<version-number>cloudtest-1.6.2</version-number>
 	<download-url>http://sourceforge.net/projects/cloudtest/</download-url>
 	<license>Apache License Version 2.0</license>
 	<author>jordan.xue</author>
