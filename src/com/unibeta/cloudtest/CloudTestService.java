@@ -1170,7 +1170,18 @@ public class CloudTestService implements TestService {
 	private void executeForeachCases(String casePath, Case c, String group, String assertFileName, CloudTestInput input,
 			List<CloudTestOutput> oututputList) throws Exception {
 
-		Object foreach = ObjectDigester.fromJava(c.foreach);
+		Object fromJava = ObjectDigester.fromJava(c.foreach);
+		Object foreach = null;
+		
+		if (fromJava != null) {
+			if (fromJava.getClass().isArray()) {
+				foreach = new ArrayList();
+				CommonUtils.copyArrayToList((Object[])fromJava, (List) foreach);
+			} else if (fromJava instanceof Iterable) {
+				foreach = fromJava;
+			}
+		}
+		
 		if (foreach != null && foreach instanceof Iterable) {
 
 			Iterable interable = (Iterable) foreach;
