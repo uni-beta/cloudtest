@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>$beans$</className>
+            <methodName>getBean</methodName>
+            <parameter>
+               <dataType>string</dataType>
+               <name>springBeanName</name>
+               <parameterType>0</parameterType>
+               <value>"springBeanName"</value>
+            </parameter>
+    </testCase>
+</cloudtest>

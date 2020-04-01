@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>$CloudObject$</className>
+            <methodName>fromJava</methodName>
+            <parameter>
+               <dataType>string</dataType>
+               <parameterType>0</parameterType>
+               <value>
+               <![CDATA[
+                  <string>
+                     new Date();
+
+                     com.unibeta.cloudtest.tool.CloudTestRecorder.start();
+                     com.unibeta.cloudtest.tool.CloudTestRecorder.stop();
+                     com.unibeta.cloudtest.parallel.util.LocalParallelJobUtil.setCurrentUser(null);//clean parallel lock
+
+                     $RootPath$;
+                     //$cache$.get("name","key");
+                     //$cache$.put("name","key",value);
+                     $PluginConfig$.getParamValueByName("paramName");
+                     //$CloudObject$.fromXML("xmlfilepath");
+                     //$CloudObject$.toXML(obj);
+                     //$CloudObject$.evl("I am groovy script");
+               	</string>
+               ]]>	
+               </value>
+            </parameter>
+         </testCase>
+</cloudtest>

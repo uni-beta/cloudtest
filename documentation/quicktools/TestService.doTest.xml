@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>com.unibeta.cloudtest.CloudTestService</className>
+            <methodName>doTest</methodName>
+            <parameter>
+               <dataType>com.unibeta.cloudtest.CloudCaseInput</dataType>
+               <name>CloudCaseInput</name>
+               <parameterType>0</parameterType>
+               <value>
+               	<![CDATA[
+               	<com.unibeta.cloudtest.CloudCaseInput>
+                        <fileName>TestCase/temp</fileName>
+                        <caseId>
+                            <java.lang.String>?</java.lang.String>
+                        </caseId>
+				</com.unibeta.cloudtest.CloudCaseInput>
+               	]]>	
+               	</value>
+            </parameter>
+    </testCase>
+</cloudtest>

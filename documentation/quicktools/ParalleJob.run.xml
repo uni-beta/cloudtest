@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>com.unibeta.cloudtest.parallel.ParallelJob</className>
+            <methodName>run</methodName>
+            <parameter>
+               <dataType>string</dataType>
+               <name>Test case URI name</name>
+               <parameterType>0</parameterType>
+               <value>"TestCase/pkgs"</value>
+            </parameter>
+            <parameter>
+               <dataType>string</dataType>
+               <name>report mail address</name>
+               <parameterType>0</parameterType>
+               <value>"yourname@example.com"</value>
+            </parameter>
+    </testCase>
+    <testCase>
+            <className>com.unibeta.cloudtest.parallel.ParallelJob</className>
+            <methodName>run</methodName>
+            <parameter>
+               <dataType>string</dataType>
+               <name>callType: webservice or restful</name>
+               <parameterType>0</parameterType>
+               <value>"webservice"</value>
+            </parameter>
+            <parameter>
+               <dataType>java.util.Map</dataType>
+               <name>remote server map with name and url</name>
+               <parameterType>0</parameterType>
+               <value>
+                map = new HashMap();
+                map.put("serverNmae1","serverURL1");// set server name url
+                map.put("serverNmae2","serverURL2");// set server name url
+                return map;
+               </value>
+            </parameter>
+            <parameter>
+               <dataType>string</dataType>
+               <name>Test case URI name</name>
+               <parameterType>0</parameterType>
+               <value>"TestCase/pkgs"</value>
+            </parameter>
+            <parameter>
+               <dataType>string</dataType>
+               <name>report mail address</name>
+               <parameterType>0</parameterType>
+               <value>"yourname@mailaddress.com"</value>
+            </parameter>
+            <parameter>
+               <dataType>boolean</dataType>
+               <name>needRollbackHomePath</name>
+               <parameterType>0</parameterType>
+               <value>true</value>
+            </parameter>
+    </testCase>
+</cloudtest>

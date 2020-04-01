@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>com.unibeta.cloudtest.tool.Java2TestCases</className>
+            <methodName>digestToTestCases</methodName>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>class name or package's test cases to be generated</name>
+               <parameterType>0</parameterType>
+               <value>"org.xxx.pkg.MyService"</value>
+            </parameter>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>given output test cases' folder under TestCase dir</name>
+               <parameterType>0</parameterType>
+               <value>"temp_folder"</value>
+            </parameter>
+            <parameter>
+               <dataType>int</dataType>
+               <name>method access level
+               	0: public; 
+                  1: protected,public; 
+               	2: private,protected,public; others: public
+               </name>
+               <parameterType>0</parameterType>
+               <value>0</value>
+            </parameter>
+    </testCase>
+</cloudtest>

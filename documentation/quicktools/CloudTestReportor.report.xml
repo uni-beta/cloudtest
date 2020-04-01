@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+     <testCase id= "normal">
+            <className>com.unibeta.cloudtest.tool.CloudTestReportor</className>
+            <methodName>report</methodName>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>title prefix in mail</name>
+               <parameterType>0</parameterType>
+               <value>"[project-name]"</value>
+            </parameter>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>case file</name>
+               <parameterType>0</parameterType>
+               <value>"TestCase"</value>
+            </parameter>
+            <parameter>
+               <name>email address to</name>
+               <dataType>java.lang.String</dataType>
+               <parameterType>0</parameterType>
+               <value>"yourname@example.com"</value>
+            </parameter>
+         </testCase>
+         <testCase id= "loading">
+            <className>com.unibeta.cloudtest.tool.CloudTestReportor</className>
+            <methodName>report</methodName>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>title prefix in mail</name>
+               <parameterType>0</parameterType>
+               <value>"[project name]"</value>
+            </parameter>
+            <parameter>
+               <dataType>com.unibeta.cloudtest.CloudLoadInput</dataType>
+               <name>CloudLoadInput</name>
+               <parameterType>0</parameterType>
+               <value>
+                <![CDATA[
+               	<com.unibeta.cloudtest.CloudLoadInput>
+		                  <fileName>TestCase/temp</fileName>
+			               <concurrentNumber>10</concurrentNumber>
+                        <concurrentSeconds>0</concurrentSeconds>
+                        <maxThreadPoolSize>10</maxThreadPoolSize>
+                 </com.unibeta.cloudtest.CloudLoadInput>	
+                ]]>
+               </value>
+            </parameter>
+            <parameter>
+               <name>valid email address to, null or "" will skip</name>
+               <dataType>java.lang.String</dataType>
+               <parameterType>0</parameterType>
+               <value>"yourname@emailaddress.com"</value>
+            </parameter>
+         </testCase>
+</cloudtest>

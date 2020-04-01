@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+  <testCase>
+            <className>com.unibeta.cloudtest.tool.CloudTestRecorder</className>
+            <methodName>start</methodName>
+   </testCase>
+</cloudtest>

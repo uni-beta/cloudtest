@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cloudtest>
+    <testCase>
+            <className>com.unibeta.cloudtest.tool.Java2TestCases</className>
+            <methodName>digestToMockXmlData</methodName>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>class name or package's test cases to be generated</name>
+               <parameterType>0</parameterType>
+               <value>"com.unibeta.cloudtest.CloudCaseInput"</value>
+            </parameter>
+            <parameter>
+               <dataType>java.lang.String</dataType>
+               <name>given output test cases' folder under TestCase dir</name>
+               <parameterType>0</parameterType>
+               <value>"d://temp/testdata.xml"</value>
+            </parameter>
+    </testCase>
+</cloudtest>

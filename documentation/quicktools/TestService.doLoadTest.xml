@@ -1,0 +1,21 @@
+<cloudtest>
+    <testCase>
+                <className>com.unibeta.cloudtest.CloudTestService</className>
+                <methodName>doLoadTest</methodName>
+                <parameter>
+                <dataType>com.unibeta.cloudtest.CloudCaseInput</dataType>
+                <name>Test case URI name</name>
+                <parameterType>0</parameterType>
+                <value>
+                    <![CDATA[
+                    <com.unibeta.cloudtest.CloudLoadInput>
+                        <fileName>TestCase/temp</fileName>
+                        <concurrentNumber>10</concurrentNumber>
+                        <concurrentSeconds>0</concurrentSeconds>
+                        <maxThreadPoolSize>10</maxThreadPoolSize>
+                    </com.unibeta.cloudtest.CloudLoadInput>	
+                    ]]>	
+                    </value>
+                </parameter>
+        </testCase>
+</cloudtest>
