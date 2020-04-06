@@ -23,6 +23,12 @@ public class PluginConfigProxy {
 
 	private static PluginConfig pluginConfig = null;
 	private static long lastModified = 0;
+	
+	private final static double BEAT_CHECK_INTERVAL_MAX_SECONDS = 60;
+	private final static double BEAT_CHECK_INTERVAL_MIN_SECONDS = 5;
+	private final static double BEAT_CHECK_INTERVAL_STEP_SECONDS = 1.01;
+	private static long lastBeatCheck = 0;
+	private static double currentBeatCheckInterval = BEAT_CHECK_INTERVAL_MIN_SECONDS;
 
 	private static Map<String, Object> cloudTestPluginInstancesMap = new HashMap<String, Object>();
 	private static Map<String, String> paramValueMap = new HashMap<String, String>();
@@ -174,18 +180,32 @@ public class PluginConfigProxy {
 
 	}
 
-	private static void init() throws Exception {
+	/**
+	 * Initial config data and return whether reloaded or not.
+	 * @return true as reloaded; false as no changes.
+	 * @throws Exception
+	 */
+	private static boolean init() throws Exception {
 
-		File CONFIG_FILE = new File(
-				ConfigurationProxy.getConfigurationFilePath());
+		File CONFIG_FILE = new File(ConfigurationProxy.getConfigurationFilePath());
 
-		if (CONFIG_FILE.exists() && lastModified != CONFIG_FILE.lastModified()) {
+		double elaspe = (System.currentTimeMillis() - lastBeatCheck) / 1000.00;
+
+		if (elaspe > currentBeatCheckInterval && CONFIG_FILE.exists() && lastModified != CONFIG_FILE.lastModified()) {
 			initCloudTestPluginInstancesMap();
 			initParamValueMap();
 
 			lastModified = CONFIG_FILE.lastModified();
+			lastBeatCheck = System.currentTimeMillis();
+			currentBeatCheckInterval = BEAT_CHECK_INTERVAL_MIN_SECONDS;
+			return true;
+		} else {
+			currentBeatCheckInterval *= BEAT_CHECK_INTERVAL_STEP_SECONDS;
+			if (currentBeatCheckInterval > BEAT_CHECK_INTERVAL_MAX_SECONDS) {
+				currentBeatCheckInterval = BEAT_CHECK_INTERVAL_MIN_SECONDS;
+			}
+			return false;
 		}
-
 	}
 
 	public static void refresh() throws Exception {
@@ -195,8 +215,9 @@ public class PluginConfigProxy {
 	}
 
 	private static void initCloudTestPluginInstancesMap() throws Exception {
-
-		List<Plugin> list = loadGlobalPluginConfig().plugin;
+		
+		pluginConfig = loadGlobalPluginConfig();
+		List<Plugin> list = pluginConfig.plugin;
 		cloudTestPluginInstancesMap.clear();
 
 		for (Plugin e : list) {
@@ -254,6 +275,23 @@ public class PluginConfigProxy {
 						.getDocumentByFileName(ConfigurationProxy
 								.getConfigurationFilePath())),
 				PluginConfig.class);
+
+		return pluginConfig;
+	}
+	
+	/**
+	 * Gets cached <code>PluginConfig</code> from PluginConfig.xml file.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static PluginConfig getGlobalPluginConfig() throws Exception {
+
+		init();
+		
+		if(pluginConfig ==null) {
+			pluginConfig = loadGlobalPluginConfig();
+		}
 
 		return pluginConfig;
 	}

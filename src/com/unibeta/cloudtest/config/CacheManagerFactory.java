@@ -7,19 +7,46 @@ import com.unibeta.cloudtest.constant.CloudTestConstants;
 
 public class CacheManagerFactory {
 
+	static Boolean hasEhcache = null;
+
+	// static CacheManager ehCacheManagerImpl = new EHCacheManagerImpl();
+	// static CacheManager cloudTestContextImpl = new CloudTestContextImpl();
+
+	static CacheManager cacheManager = null;
+
 	public static CacheManager getInstance() {
+		
+		if( null != cacheManager) {
+			return cacheManager;
+		}
 
 		try {
-			if (CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE_EHCACHE.equalsIgnoreCase(
+			if (checkHasEhcache() && CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE_EHCACHE.equalsIgnoreCase(
 					PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE))) {
-				Class.forName("net.sf.ehcache.CacheManager");
-				return new EHCacheManagerImpl();
+				cacheManager = new EHCacheManagerImpl();
+				return cacheManager;
 			} else {
-				return new CloudTestContextImpl();
+				cacheManager = new CloudTestContextImpl();
+				return cacheManager;
 			}
-
 		} catch (Exception e) {
-			return new CloudTestContextImpl();
+			cacheManager = new CloudTestContextImpl();
+			return cacheManager;
+		}
+	}
+
+	static boolean checkHasEhcache() {
+
+		if (hasEhcache == null) {
+			try {
+				Class.forName("net.sf.ehcache.CacheManager");
+				hasEhcache = true;
+			} catch (ClassNotFoundException e) {
+				hasEhcache = false;
+			}
+			return hasEhcache;
+		} else {
+			return hasEhcache;
 		}
 	}
 }
