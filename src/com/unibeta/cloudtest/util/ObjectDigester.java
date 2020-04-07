@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
-import bsh.Interpreter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.unibeta.cloudtest.config.CacheManagerFactory;
