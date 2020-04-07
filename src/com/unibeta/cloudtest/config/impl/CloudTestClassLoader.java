@@ -73,8 +73,8 @@ public class CloudTestClassLoader extends URLClassLoader {
 
             synchronized (classRUIName) {
                 CacheManagerFactory
-                        .getInstance()
-                        .put(CacheManagerFactory.getInstance().CACHE_TYPE_JAVA_INSTANCE,
+                        .getThreadLocalInstance()
+                        .put(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_JAVA_INSTANCE,
                                 classRUIName, instance);
             }
 
@@ -125,8 +125,8 @@ public class CloudTestClassLoader extends URLClassLoader {
 
         String className = buildClassPath();
 
-        instance = CacheManagerFactory.getInstance().get(
-                CacheManagerFactory.getInstance().CACHE_TYPE_JAVA_INSTANCE,
+        instance = CacheManagerFactory.getThreadLocalInstance().get(
+                CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_JAVA_INSTANCE,
                 className);
 
         if (null == instance) {

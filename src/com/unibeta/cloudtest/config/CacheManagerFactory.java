@@ -1,38 +1,80 @@
 package com.unibeta.cloudtest.config;
 
-import com.unibeta.cloudtest.config.impl.CloudTestContextImpl;
 import com.unibeta.cloudtest.config.impl.EHCacheManagerImpl;
+import com.unibeta.cloudtest.config.impl.SimpleGlobalCacheImpl;
+import com.unibeta.cloudtest.config.impl.SimpleThreadLocalCacheImpl;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 
 public class CacheManagerFactory {
 
-	static Boolean hasEhcache = null;
+	private static Boolean hasEhcache = null;
 
-	// static CacheManager ehCacheManagerImpl = new EHCacheManagerImpl();
-	// static CacheManager cloudTestContextImpl = new CloudTestContextImpl();
+	private static CacheManager threadLocalCacheManager = null;
+	private static CacheManager globalCacheManager = null;
 
-	static CacheManager cacheManager = null;
+	/**
+	 * Get cache manager instance of Threadlocal supported. It is of thread safety.
+	 * 
+	 * @return
+	 */
+	public static CacheManager getThreadLocalInstance() {
 
-	public static CacheManager getInstance() {
-		
-		if( null != cacheManager) {
-			return cacheManager;
+		if (null != threadLocalCacheManager) {
+			return threadLocalCacheManager;
 		}
 
 		try {
 			if (checkHasEhcache() && CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE_EHCACHE.equalsIgnoreCase(
 					PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE))) {
-				cacheManager = new EHCacheManagerImpl();
-				return cacheManager;
+				threadLocalCacheManager = new EHCacheManagerImpl();
+				return threadLocalCacheManager;
 			} else {
-				cacheManager = new CloudTestContextImpl();
-				return cacheManager;
+				threadLocalCacheManager = new SimpleThreadLocalCacheImpl();
+				return threadLocalCacheManager;
 			}
 		} catch (Exception e) {
-			cacheManager = new CloudTestContextImpl();
-			return cacheManager;
+			threadLocalCacheManager = new SimpleThreadLocalCacheImpl();
+			return threadLocalCacheManager;
 		}
+	}
+
+	/**
+	 * Gets global cache manager, it is not of thread safety.
+	 * 
+	 * @return
+	 */
+	public static CacheManager getGlobalCacheInstance() {
+
+		if (null != globalCacheManager) {
+			return globalCacheManager;
+		}
+
+		try {
+			if (checkHasEhcache() && CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE_EHCACHE.equalsIgnoreCase(
+					PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE_TYPE))) {
+				globalCacheManager = new EHCacheManagerImpl(false);
+				return globalCacheManager;
+			} else {
+				globalCacheManager = new SimpleGlobalCacheImpl();
+				return globalCacheManager;
+			}
+		} catch (Exception e) {
+			globalCacheManager = new SimpleGlobalCacheImpl();
+			return globalCacheManager;
+		}
+	}
+
+	/**
+	 * Get cache manager instance of Threadlocal supported. It is of thread safety.
+	 * Same as getThreadLocalInstance().
+	 * 
+	 * @see getThreadLocalInstance()
+	 * @return
+	 */
+	@Deprecated
+	public static CacheManager getInstance() {
+		return getThreadLocalInstance();
 	}
 
 	static boolean checkHasEhcache() {

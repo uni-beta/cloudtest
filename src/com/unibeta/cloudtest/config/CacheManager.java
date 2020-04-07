@@ -33,6 +33,11 @@ public interface CacheManager {
      * tasks_queue
      */
     public static String CACHE_TYPE_TASKS_QUEUE = "tasks_queue";
+    /**
+     * running_status
+     */
+    public static String CACHE_TYPE_RUNNING_STATUS = "running_status";
+    public static String CACHE_TYPE_RUNNING_STATUS_IS_BATCH_RUNNING = "isBatchRunning";
 
     public void clear();
 
@@ -43,4 +48,5 @@ public interface CacheManager {
     public List<String> keySet(String contextType);
 
     public void put(String contextType, String key, Object value);
+    public boolean isThreadLocalCache();
 }

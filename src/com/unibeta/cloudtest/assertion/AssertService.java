@@ -22,6 +22,7 @@ public class AssertService {
     private static final int MAX_TRY_TIMES = 10;
     private static final CloudTestAssert CLOUD_TEST_ASSERT_OBJECT = new CloudTestAssert();
     private static Logger log = Logger.getLogger(AssertService.class);
+    private String synchronizedFileName = "";
 
     public List<AssertResult> doAssert(String fileName, String assertId,
             Object obj) {
@@ -36,32 +37,32 @@ public class AssertService {
         String[] errs = null;
         int i = 0;
         boolean done = false;
-        while (!done) {
+        synchronizedFileName = fileName;
+        synchronized (synchronizedFileName) {
+			while (!done) {
+				try {
+					errs = engine.validate(map, fileName);
+					done = true;
+				} catch (ClassNotFoundException e) {
+					if (i < MAX_TRY_TIMES) {
+						try {
+							Thread.sleep(1 * 1000);
+						} catch (InterruptedException e1) {
+							// Empty
+						}
+					} else {
+						log.error("assertion failure " + MAX_TRY_TIMES + " times caused by: " + e.getMessage(), e);
+						break;
+					}
+				} catch (Exception e) {
+					log.error("assertion failure caused by: " + e.getMessage(), e);
+					break;
+				}
 
-            try {
-                errs = engine.validate(map, fileName);
-                done = true;
-            } catch (ClassNotFoundException e) {
-                if (i < MAX_TRY_TIMES) {
-                    try {
-                        Thread.sleep(1 * 1000);
-                    } catch (InterruptedException e1) {
-                        // Empty
-                    }
-                } else {
-                    log.error("assertion failure " + MAX_TRY_TIMES
-                            + " times caused by: " + e.getMessage(), e);
-                    break;
-                }
-            } catch (Exception e) {
-                log.error("assertion failure caused by: " + e.getMessage(), e);
-                break;
-            }
-
-            i++;
-        }
-
-        if (errs == null) {
+				i++;
+			}
+		}
+		if (errs == null) {
             return null;
         } else {
             List<AssertResult> list = new ArrayList<AssertResult>();

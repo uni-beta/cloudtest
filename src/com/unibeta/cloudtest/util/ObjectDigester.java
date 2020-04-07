@@ -1,16 +1,12 @@
 package com.unibeta.cloudtest.util;
 
-import groovy.lang.GroovyShell;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
-import bsh.EvalError;
 import bsh.Interpreter;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.unibeta.cloudtest.config.CacheManagerFactory;
@@ -25,6 +21,10 @@ import com.unibeta.vrules.engines.dccimpls.DynamicCompiler;
 import com.unibeta.vrules.utils.CommonUtils;
 import com.unibeta.vrules.utils.XmlUtils;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import groovy.lang.GroovyShell;
+
 /**
  * Java object marshal/unmarshal tool between object and xml.
  * 
@@ -34,30 +34,32 @@ public class ObjectDigester {
 
 	protected static ObjectDigester this_ = new ObjectDigester();
 	private static XStream x = new XStream(new DomDriver("UTF-8"));
-	private static ThreadLocal<Interpreter> bshThreadLocal = new ThreadLocal<Interpreter>();
-	private static ThreadLocal<GroovyShell> groovyThreadLocal = new ThreadLocal<GroovyShell>();
+	private static ThreadLocal<Object> bshThreadLocal = new ThreadLocal<Object>();
+	private static ThreadLocal<Object> groovyThreadLocal = new ThreadLocal<Object>();
+	private static ThreadLocal<Map> runtimeDataThreadLocal = new ThreadLocal<Map>();
+	
+	private static Object getBeanSheelEngine() {
 
-	public static Interpreter getBeanSheelEngine() {
-		
-		Interpreter v = bshThreadLocal.get();
-		if(v== null) {
+		Interpreter v = (Interpreter) bshThreadLocal.get();
+		if (v == null) {
 			v = new Interpreter();
 			bshThreadLocal.set(v);
 		}
-		
+
 		return v;
-	} 
-	
-	public static GroovyShell getGroovyEngine() {
-		
-		GroovyShell v = groovyThreadLocal.get();
-		if(v== null) {
+	}
+
+	private static Object getGroovyEngine() {
+
+		GroovyShell v = (GroovyShell) groovyThreadLocal.get();
+		if (v == null) {
 			v = new GroovyShell();
 			groovyThreadLocal.set(v);
 		}
-		
+
 		return v;
-	} 
+	}
+
 	/**
 	 * Convert xml file to object instance
 	 * 
@@ -202,13 +204,13 @@ public class ObjectDigester {
 					e);
 		}
 
-		GroovyShell bsh = getGroovyEngine();
-		for (String k : CacheManagerFactory.getInstance()
+		GroovyShell bsh = (GroovyShell)getGroovyEngine();
+		for (String k : CacheManagerFactory.getThreadLocalInstance()
 
-				.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
+				.keySet(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA)) {
 
-			bsh.setVariable(k, CacheManagerFactory.getInstance()
-					.get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA, k));
+			bsh.setVariable(k, CacheManagerFactory.getThreadLocalInstance()
+					.get(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA, k));
 
 		}
 
@@ -239,13 +241,12 @@ public class ObjectDigester {
 					e);
 		}
 
-		Interpreter bsh = getBeanSheelEngine();
-		for (String k : CacheManagerFactory.getInstance()
-				.keySet(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA)) {
+		Interpreter bsh = (Interpreter)getBeanSheelEngine();
+		for (String k : CacheManagerFactory.getThreadLocalInstance()
+				.keySet(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA)) {
 
-			bsh.set(k, CacheManagerFactory.getInstance().get(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA,
+			bsh.set(k, CacheManagerFactory.getThreadLocalInstance().get(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA,
 					k));
-
 		}
 
 		Map<String, Object> vars = setDefaultRuntimeData();
@@ -272,9 +273,20 @@ public class ObjectDigester {
 
 	private static Map<String, Object> setDefaultRuntimeData() throws EvalError {
 
+		Map data = runtimeDataThreadLocal.get();
+
+		if (data == null || PluginConfigProxy.isModified()) {
+			data = buildRuntimeData();
+			runtimeDataThreadLocal.set(data);
+		}
+
+		return data;
+	}
+
+	private static Map<String, Object> buildRuntimeData() {
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE, CacheManagerFactory.getInstance());
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE, CacheManagerFactory.getThreadLocalInstance());
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CLOUD_OBJECT, this_);
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_ROOT_PATH, ConfigurationProxy.getCloudTestRootPath());
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_JAVA2_TEST_CASES, new Java2TestCases());
@@ -283,7 +295,7 @@ public class ObjectDigester {
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_PLUGIN_CONFIG, new PluginConfigProxy());
 
 		try {
-			PluginConfig config = PluginConfigProxy.loadGlobalPluginConfig();
+			PluginConfig config = PluginConfigProxy.getGlobalPluginConfig();
 
 			for (PluginConfig.Plugin p : config.plugin) {
 				if (p.id.startsWith("$") && p.id.endsWith("$")) {
@@ -358,7 +370,7 @@ public class ObjectDigester {
 
 			if (null != result) {
 
-				CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE, fullPath,
+				CacheManagerFactory.getGlobalCacheInstance().put(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
 						System.currentTimeMillis());
 
 				throw new Exception(
@@ -366,7 +378,7 @@ public class ObjectDigester {
 								+ fullPath + "], compiling fatal errors were found below:\n" + result);
 			}
 
-			CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE, fullPath,
+			CacheManagerFactory.getGlobalCacheInstance().put(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
 					new File(fullPath).lastModified());
 
 		}
@@ -386,7 +398,7 @@ public class ObjectDigester {
 	private static boolean isModified(String fullPath) {
 
 		File f = new File(fullPath);
-		Object o = CacheManagerFactory.getInstance().get(CacheManagerFactory.getInstance().CACHE_TYPE_SRC_FILE,
+		Object o = CacheManagerFactory.getGlobalCacheInstance().get(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE,
 				fullPath);
 
 		if (null != o && (new Long(f.lastModified()).equals(new Long(o.toString())))) {

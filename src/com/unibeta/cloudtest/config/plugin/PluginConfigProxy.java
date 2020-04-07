@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.unibeta.cloudtest.config.CacheManager;
+import com.unibeta.cloudtest.config.CacheManagerFactory;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Param;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Plugin;
@@ -23,7 +25,7 @@ public class PluginConfigProxy {
 
 	private static PluginConfig pluginConfig = null;
 	private static long lastModified = 0;
-	
+
 	private final static double BEAT_CHECK_INTERVAL_MAX_SECONDS = 60;
 	private final static double BEAT_CHECK_INTERVAL_MIN_SECONDS = 5;
 	private final static double BEAT_CHECK_INTERVAL_STEP_SECONDS = 1.01;
@@ -42,8 +44,7 @@ public class PluginConfigProxy {
 	 * @throws Exception
 	 *             if the given class is not assignable from return instance.
 	 */
-	public static CloudTestPlugin getCloudTestPluginInstance(String id)
-			throws Exception {
+	public static CloudTestPlugin getCloudTestPluginInstance(String id) throws Exception {
 
 		Object obj = PluginConfigProxy.getPluginObject(id);
 
@@ -182,6 +183,7 @@ public class PluginConfigProxy {
 
 	/**
 	 * Initial config data and return whether reloaded or not.
+	 * 
 	 * @return true as reloaded; false as no changes.
 	 * @throws Exception
 	 */
@@ -215,42 +217,34 @@ public class PluginConfigProxy {
 	}
 
 	private static void initCloudTestPluginInstancesMap() throws Exception {
-		
+
 		pluginConfig = loadGlobalPluginConfig();
 		List<Plugin> list = pluginConfig.plugin;
 		cloudTestPluginInstancesMap.clear();
 
 		for (Plugin e : list) {
-			if (!CommonUtils.isNullOrEmpty(e.className)
-					&& !CommonUtils.isNullOrEmpty(e.id)) {
+			if (!CommonUtils.isNullOrEmpty(e.className) && !CommonUtils.isNullOrEmpty(e.id)) {
 				try {
 					Thread.currentThread().getContextClassLoader().loadClass(e.className.trim());
 					Class implementation = Thread.currentThread().getContextClassLoader().loadClass(e.className.trim());
 					Class defination = Thread.currentThread().getContextClassLoader().loadClass(e.id.trim());
 
 					if (!defination.isAssignableFrom(implementation)) {
-						throw new Exception("given plguin '" + e.id
-								+ "' is not assignable from '" + e.className
-								+ "'");
+						throw new Exception("given plguin '" + e.id + "' is not assignable from '" + e.className + "'");
 					} else {
 
 						Object newInstance = implementation.newInstance();
 						if (newInstance instanceof CloudTestPlugin) {
-							cloudTestPluginInstancesMap.put((e.id),
-									(CloudTestPlugin) newInstance);
-						} else { 
-							throw new Exception("given "
-									+ implementation.getName()
-									+ " Plugin component have to extends '"
-									+ CloudTestPlugin.class.getName() + "'. ");
+							cloudTestPluginInstancesMap.put((e.id), (CloudTestPlugin) newInstance);
+						} else {
+							throw new Exception("given " + implementation.getName()
+									+ " Plugin component have to extends '" + CloudTestPlugin.class.getName() + "'. ");
 						}
 					}
 				} catch (Exception e1) {
 					try {
-						Class implementation = Class
-								.forName(e.className.trim());
-						cloudTestPluginInstancesMap.put(e.id,
-								implementation.newInstance());
+						Class implementation = Class.forName(e.className.trim());
+						cloudTestPluginInstancesMap.put(e.id, implementation.newInstance());
 					} catch (Exception e2) {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
@@ -271,14 +265,13 @@ public class PluginConfigProxy {
 	public static PluginConfig loadGlobalPluginConfig() throws Exception {
 
 		pluginConfig = (PluginConfig) ObjectSerializer.unmarshalToObject(
-				XmlUtils.paserDocumentToString(XmlUtils
-						.getDocumentByFileName(ConfigurationProxy
-								.getConfigurationFilePath())),
+				XmlUtils.paserDocumentToString(
+						XmlUtils.getDocumentByFileName(ConfigurationProxy.getConfigurationFilePath())),
 				PluginConfig.class);
 
 		return pluginConfig;
 	}
-	
+
 	/**
 	 * Gets cached <code>PluginConfig</code> from PluginConfig.xml file.
 	 * 
@@ -288,12 +281,34 @@ public class PluginConfigProxy {
 	public static PluginConfig getGlobalPluginConfig() throws Exception {
 
 		init();
-		
-		if(pluginConfig ==null) {
+
+		if (pluginConfig == null) {
 			pluginConfig = loadGlobalPluginConfig();
 		}
 
 		return pluginConfig;
+	}
+
+	/**
+	 * check PluginConfig.xml file modified or not.
+	 * 
+	 * @return true or false
+	 */
+	public static boolean isModified() {
+		boolean bool = false;
+		try {
+			Object batchRunning = CacheManagerFactory.getGlobalCacheInstance()
+					.get(CacheManager.CACHE_TYPE_RUNNING_STATUS, CacheManager.CACHE_TYPE_RUNNING_STATUS);
+			if (batchRunning == null) {
+				batchRunning = false;
+			}
+
+			bool = !(Boolean) batchRunning && init();
+		} catch (Exception e) {
+			e.printStackTrace();
+			bool = false;
+		}
+		return bool;
 	}
 
 	// public static void main(String[] args) {

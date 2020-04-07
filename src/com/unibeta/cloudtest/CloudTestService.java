@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +74,7 @@ public class CloudTestService implements TestService {
 	private static Logger logger = Logger.getLogger(CloudTestService.class);
 
 	private static Pattern xmlValuePattern = Pattern.compile(REGEX_XML_EXPRESSION, Pattern.DOTALL);
-
+	private static Queue<String> assertQueue = new LinkedBlockingQueue<String>();
 	// private XStream x = new XStream(new DomDriver());
 
 	/**
@@ -94,12 +95,16 @@ public class CloudTestService implements TestService {
 		CloudTestOutput output = new CloudTestOutput();
 
 		try {
+			PluginConfigProxy.refresh();
+			setBatchRunning(true);
+
 			output = invoke(input);
 		} catch (Exception e) {
 			logger.error(e.getMessage() + CloudTestUtils.printExceptionStackTrace(e));
 			printExceptionStack(output, e);
 		} finally {
-			CacheManagerFactory.getInstance().clear();
+			CacheManagerFactory.getThreadLocalInstance().clear();
+			setBatchRunning(false);
 		}
 
 		output.setReturnValue(null);
@@ -156,7 +161,7 @@ public class CloudTestService implements TestService {
 		output.setTestCaseResults(list);
 		output.setStatus(true);
 
-		CacheManagerFactory.getInstance().clear();
+		CacheManagerFactory.getThreadLocalInstance().clear();
 
 		resolveParallelJobLockRisk(checkParallelJobLockRisk, output);
 		return output;
@@ -271,7 +276,8 @@ public class CloudTestService implements TestService {
 		if ("true".equalsIgnoreCase(c.returnFlag) && !CommonUtils.isNullOrEmpty(c.returnTo)
 				&& doTestOutput.getStatus()) {
 
-			CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_RUNTIME_DATA, c.returnTo,
+			CacheManagerFactory.getThreadLocalInstance().put(
+					CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA, c.returnTo,
 					doTestOutput.getReturnValue());
 		}
 
@@ -481,6 +487,9 @@ public class CloudTestService implements TestService {
 		int maxDetailedLoadTestResponseAmount = 100000;
 
 		try {
+			PluginConfigProxy.refresh();
+			setBatchRunning(true);
+			
 			maxDetailedLoadTestResponseAmount = CloudTestPluginFactory.getParamConfigServicePlugin()
 					.getMaxDetailedLoadTestResponseAmount();
 
@@ -505,6 +514,7 @@ public class CloudTestService implements TestService {
 			// Waiting for all thread ending, let them join here
 			boolean done = false;
 			while (!done) {
+				setBatchRunning(true);
 				done = executor.awaitTermination(10, TimeUnit.MILLISECONDS);
 			}
 			end = System.currentTimeMillis();
@@ -559,11 +569,17 @@ public class CloudTestService implements TestService {
 			}
 
 			CloudTestUtils.processResultStatistics(output, false);
-			CacheManagerFactory.getInstance().clear();
+			CacheManagerFactory.getThreadLocalInstance().clear();
+			setBatchRunning(false);
 		}
 
 		resolveParallelJobLockRisk(checkParallelJobLockRisk, output);
 		return output;
+	}
+
+	private void setBatchRunning(boolean running) {
+		CacheManagerFactory.getGlobalCacheInstance().put(CacheManager.CACHE_TYPE_RUNNING_STATUS,
+				CacheManager.CACHE_TYPE_RUNNING_STATUS_IS_BATCH_RUNNING, true);
 	}
 
 	private void printExceptionStack(CloudTestOutput output, Exception e) {
@@ -722,8 +738,8 @@ public class CloudTestService implements TestService {
 								executeTestCase(group, c, casePath, assertFileName, outputList);
 							}
 
-							CacheManagerFactory.getInstance().remove(
-									CacheManagerFactory.getInstance().CACHE_TYPE_TASKS_QUEUE,
+							CacheManagerFactory.getThreadLocalInstance().remove(
+									CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_TASKS_QUEUE,
 									this.buildDependsNsURI(casePath, c.id));
 						}
 					} else {
@@ -759,7 +775,7 @@ public class CloudTestService implements TestService {
 				output.setStatus(false);
 			}
 
-			CacheManagerFactory.getInstance().clear();
+			CacheManagerFactory.getThreadLocalInstance().clear();
 
 			long end = System.currentTimeMillis();
 			output.setRunTime((end - start) / 1000.00);
@@ -801,7 +817,11 @@ public class CloudTestService implements TestService {
 			String enable = PluginConfigProxy
 					.getParamValueByName(CloudTestConstants.CLOUDTEST_ASSERT_PRE_COMPILE_ENABLE);
 			if ("true".equalsIgnoreCase(enable)) {
-				new Thread(new CaseAssertPreCompileThread(filePathList)).start();
+				if (assertQueue.isEmpty()) {
+					new Thread(new CaseAssertPreCompileThread(filePathList)).start();
+				} else {
+					new Thread(new CaseAssertPreCompileThread(filePathList));
+				}
 			}
 		} catch (Exception e1) {
 			logger.info(
@@ -877,7 +897,8 @@ public class CloudTestService implements TestService {
 	private void clearAllCaseTasksFromContext(String casePath, CloudTestCase cloudTestCase) {
 
 		for (Case c : cloudTestCase.testCase) {
-			CacheManagerFactory.getInstance().remove(CacheManagerFactory.getInstance().CACHE_TYPE_TASKS_QUEUE,
+			CacheManagerFactory.getThreadLocalInstance().remove(
+					CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_TASKS_QUEUE,
 					this.buildDependsNsURI(casePath, c.id));
 		}
 	}
@@ -895,8 +916,8 @@ public class CloudTestService implements TestService {
 					if (!"true".equalsIgnoreCase(c.ignore)) {
 						String uri = this.buildDependsNsURI(
 								filePath.substring(ConfigurationProxy.getCloudTestRootPath().length()), c.id);
-						CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_TASKS_QUEUE,
-								uri, uri);
+						CacheManagerFactory.getThreadLocalInstance()
+								.put(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_TASKS_QUEUE, uri, uri);
 
 					}
 				}
@@ -913,8 +934,8 @@ public class CloudTestService implements TestService {
 
 		for (String ns : libs) {
 			String buildDependsNsURI = buildDependsNsURI(ns, depend);
-			object = CacheManagerFactory.getInstance().get(CacheManagerFactory.getInstance().CACHE_TYPE_TESTCASE,
-					buildDependsNsURI);
+			object = CacheManagerFactory.getThreadLocalInstance()
+					.get(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_TESTCASE, buildDependsNsURI);
 			if (null != object) {
 				return object;
 			}
@@ -1022,8 +1043,8 @@ public class CloudTestService implements TestService {
 					String buildDependsNsURI = buildDependsNsURI(cloudTestCase.ns, c.id);
 
 					c.ns = cloudTestCase.ns;
-					CacheManagerFactory.getInstance().put(CacheManagerFactory.getInstance().CACHE_TYPE_TESTCASE,
-							buildDependsNsURI, c);
+					CacheManagerFactory.getThreadLocalInstance().put(
+							CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_TESTCASE, buildDependsNsURI, c);
 				}
 
 			} catch (Exception e) {
@@ -1172,23 +1193,24 @@ public class CloudTestService implements TestService {
 
 		Object fromJava = ObjectDigester.fromJava(c.foreach);
 		Object foreach = null;
-		
+
 		if (fromJava != null) {
 			if (fromJava.getClass().isArray()) {
 				foreach = new ArrayList();
-				CommonUtils.copyArrayToList((Object[])fromJava, (List) foreach);
+				CommonUtils.copyArrayToList((Object[]) fromJava, (List) foreach);
 			} else if (fromJava instanceof Iterable) {
 				foreach = fromJava;
 			}
 		}
-		
+
 		if (foreach != null && foreach instanceof Iterable) {
 
 			Iterable interable = (Iterable) foreach;
 			int i = 0;
 
 			for (Object eachvar : interable) {
-				CacheManagerFactory.getInstance().put(CacheManager.CACHE_TYPE_RUNTIME_DATA, c.eachvar, eachvar);
+				CacheManagerFactory.getThreadLocalInstance().put(CacheManager.CACHE_TYPE_RUNTIME_DATA, c.eachvar,
+						eachvar);
 
 				CloudTestOutput testCaseOutput = new CloudTestOutput();
 				try {
@@ -1599,7 +1621,8 @@ public class CloudTestService implements TestService {
 
 				try {
 					// get object by bean factory
-					Thread.currentThread().getContextClassLoader().loadClass("org.springframework.beans.factory.BeanFactory");
+					Thread.currentThread().getContextClassLoader()
+							.loadClass("org.springframework.beans.factory.BeanFactory");
 
 					BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
@@ -1798,7 +1821,8 @@ public class CloudTestService implements TestService {
 
 			try {
 				// get object by bean factory
-				Class springClass = Thread.currentThread().getContextClassLoader().loadClass("org.springframework.beans.factory.BeanFactory");
+				Class springClass = Thread.currentThread().getContextClassLoader()
+						.loadClass("org.springframework.beans.factory.BeanFactory");
 
 				BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
@@ -1913,17 +1937,22 @@ public class CloudTestService implements TestService {
 
 		public CaseAssertPreCompileThread(List<String> filePathList) {
 
+			for (String f : filePathList) {
+				if (!assertQueue.contains(f)) {
+					assertQueue.offer(f);
+				}
+			}
+
 			this.filePathList = filePathList;
 		}
 
 		public void run() {
 
-			if (null == filePathList) {
-				return;
-			}
+			while (!assertQueue.isEmpty()) {
 
-			for (String filePath : this.filePathList) {
 				CloudTestCase cloudTestCase = null;
+				String filePath = assertQueue.poll();
+
 				try {
 					cloudTestCase = ConfigurationProxy.loadCloudTestCase(filePath, null);
 				} catch (Exception e) {
@@ -1946,7 +1975,6 @@ public class CloudTestService implements TestService {
 
 				long end = System.currentTimeMillis();
 				logger.debug(filePath + " assertion pre-compile was done in " + (end - start) / 1000.00 + "s");
-
 			}
 		}
 
