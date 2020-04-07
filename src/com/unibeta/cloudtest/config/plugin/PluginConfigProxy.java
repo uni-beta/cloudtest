@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.unibeta.cloudtest.config.CacheManager;
 import com.unibeta.cloudtest.config.CacheManagerFactory;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
@@ -34,6 +36,8 @@ public class PluginConfigProxy {
 
 	private static Map<String, Object> cloudTestPluginInstancesMap = new HashMap<String, Object>();
 	private static Map<String, String> paramValueMap = new HashMap<String, String>();
+
+	private static Logger logger = Logger.getLogger(PluginConfigProxy.class);
 
 	/**
 	 * Gets CloudTestPlugin plugin instance by id.
@@ -264,10 +268,14 @@ public class PluginConfigProxy {
 	 */
 	public static PluginConfig loadGlobalPluginConfig() throws Exception {
 
-		pluginConfig = (PluginConfig) ObjectSerializer.unmarshalToObject(
-				XmlUtils.paserDocumentToString(
-						XmlUtils.getDocumentByFileName(ConfigurationProxy.getConfigurationFilePath())),
-				PluginConfig.class);
+		try {
+			pluginConfig = (PluginConfig) ObjectSerializer.unmarshalToObject(
+					XmlUtils.paserDocumentToString(
+							XmlUtils.getDocumentByFileName(ConfigurationProxy.getConfigurationFilePath())),
+					PluginConfig.class);
+		} catch (Exception e) {
+			logger.warn("PluginConfig.xml is not in place, " + e.getMessage());
+		}
 
 		return pluginConfig;
 	}
