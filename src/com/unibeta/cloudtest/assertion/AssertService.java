@@ -6,7 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.vrules.engines.ValidationEngine;
 import com.unibeta.vrules.engines.ValidationEngineFactory;
@@ -21,7 +22,7 @@ public class AssertService {
 
     private static final int MAX_TRY_TIMES = 10;
     private static final CloudTestAssert CLOUD_TEST_ASSERT_OBJECT = new CloudTestAssert();
-    private static Logger log = Logger.getLogger(AssertService.class);
+    private static Logger log = LoggerFactory.getLogger(AssertService.class);
     private String synchronizedFileName = "";
 
     public List<AssertResult> doAssert(String fileName, String assertId,

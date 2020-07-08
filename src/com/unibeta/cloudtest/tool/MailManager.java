@@ -25,7 +25,8 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -50,7 +51,7 @@ public class MailManager {
 	public static final int MAIL_PRIORITY_NORMAL = 3;
 	public static final int MAIL_PRIORITY_HIGH = 2;
 
-	private static Logger logger = Logger.getLogger(MailManager.class);
+	private static Logger logger = LoggerFactory.getLogger(MailManager.class);
 
 	static ParamConfigServicePlugin configServicePlugin = CloudTestPluginFactory
 			.getParamConfigServicePlugin();
@@ -86,7 +87,7 @@ public class MailManager {
 										configServicePlugin
 												.getMailUserPassword());
 							} catch (Exception e) {
-								Logger.getLogger(this.getClass()).error(
+								LoggerFactory.getLogger(this.getClass()).error(
 										e.getMessage(), e.getCause());
 							}
 

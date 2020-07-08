@@ -9,7 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.config.CacheManager;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
@@ -30,7 +31,7 @@ public class EHCacheManagerImpl implements CacheManager {
 	private static net.sf.ehcache.CacheManager ehcache = null;
 	private static ThreadLocal<Set<String>> threadLocalCachedNameSet = new ThreadLocal<Set<String>>();
 
-	private static Logger log = Logger.getLogger(EHCacheManagerImpl.class);
+	private static Logger log = LoggerFactory.getLogger(EHCacheManagerImpl.class);
 	private boolean isThreadLocal = true;
 
 	public EHCacheManagerImpl(boolean isThreadLocal) {
@@ -141,7 +142,6 @@ public class EHCacheManagerImpl implements CacheManager {
 		return cache;
 	}
 
-	@Override
 	public boolean isThreadLocalCache() {
 		return this.isThreadLocal;
 	}

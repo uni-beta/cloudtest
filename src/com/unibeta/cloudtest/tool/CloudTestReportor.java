@@ -2,7 +2,8 @@ package com.unibeta.cloudtest.tool;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudLoadInput;
@@ -21,7 +22,7 @@ import com.unibeta.vrules.utils.CommonUtils;
 public class CloudTestReportor {
 
 	private static final String DEFAULT_TEST_CASE_PATH = "TestCase/";
-	private static Logger log = Logger.getLogger(CloudTestReportor.class);
+	private static Logger log = LoggerFactory.getLogger(CloudTestReportor.class);
 
 	// private XStream ObjectDigester = new XStream(new DomDriver());
 

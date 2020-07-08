@@ -199,14 +199,25 @@ public class CloudTestServlet extends HttpServlet {
 				ConfigurationProxy.setRootFolderName(rootFolderName.trim());
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			log.info("AutomaticCloudTestManager deploy failed " + e.getStackTrace());
+			log.info(e.getMessage());
 		} finally {
 			AutomationCloudTestManager.deploy();
 			deployWebService(conf);
 			log.info(this.getClass().getCanonicalName() + " startup done.");
+			cleanupOldAssertBinaryClasses();
 		}
+	}
+
+	private void cleanupOldAssertBinaryClasses() {
+		
+		String path = ConfigurationProxy.getCloudTestRootPath();
+		List<String> list = CommonUtils.searchFilesUnder(path , "^..*.bin$", "", true);
+
+		for (String f : list) {
+			CloudTestUtils.deleteFiles(f);
+			new File(f).delete();
+		}
+		
 	}
 
 	private void deployWebService(ServletConfig conf) {

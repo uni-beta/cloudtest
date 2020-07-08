@@ -16,7 +16,8 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudTestOutput;
@@ -43,7 +44,7 @@ public class AutomationCloudTestManager {
             .getProperty("user.name");
     private static Timer timer = null;
     private static Boolean isDeployed = false;
-    private static Logger log = Logger
+    private static Logger log = LoggerFactory
             .getLogger(AutomationCloudTestManager.class);
 
     /**
@@ -225,7 +226,7 @@ public class AutomationCloudTestManager {
                 }
 
             } catch (Exception e) {
-                Logger.getLogger(AutomationCloudTestManager.class).error(
+            	LoggerFactory.getLogger(AutomationCloudTestManager.class).error(
                         e.getMessage()
                                 + CloudTestUtils.printExceptionStackTrace(e),
                         e.getCause());
@@ -313,7 +314,7 @@ public class AutomationCloudTestManager {
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 try {
-                    Logger.getLogger(AutomationCloudTestManager.class)
+                	LoggerFactory.getLogger(AutomationCloudTestManager.class)
                             .error(e.getMessage()
                                     + CloudTestUtils
                                             .printExceptionStackTrace(e),
@@ -325,7 +326,7 @@ public class AutomationCloudTestManager {
                             + originalContent, false,
                             MailManager.MAIL_PRIORITY_HIGHEST);
                 } catch (Exception e1) {
-                    Logger.getLogger(AutomationCloudTestManager.class)
+                	LoggerFactory.getLogger(AutomationCloudTestManager.class)
                             .error(e1.getMessage()
                                     + CloudTestUtils
                                             .printExceptionStackTrace(e1),
@@ -344,7 +345,7 @@ public class AutomationCloudTestManager {
                         store.close();
                     }
                 } catch (MessagingException e) {
-                    Logger.getLogger(AutomationCloudTestManager.class)
+                	LoggerFactory.getLogger(AutomationCloudTestManager.class)
                             .error(e.getMessage()
                                     + CloudTestUtils
                                             .printExceptionStackTrace(e),

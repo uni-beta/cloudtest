@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.TestService;
@@ -26,7 +27,7 @@ import com.unibeta.vrules.utils.CommonUtils;
  */
 public class JobMapReducer {
 
-    static Logger log = Logger.getLogger(JobMapReducer.class);
+    static Logger log = LoggerFactory.getLogger(JobMapReducer.class);
 
     public static Map<String, Task> map(String filePath) {
 

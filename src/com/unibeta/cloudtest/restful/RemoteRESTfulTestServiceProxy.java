@@ -8,7 +8,8 @@ import javax.jws.WebParam;
 import javax.jws.WebParam.Mode;
 import javax.jws.WebResult;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudLoadInput;
@@ -36,7 +37,7 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 
 	
 	
-	private static Logger log = Logger
+	private static Logger log = LoggerFactory
 			.getLogger(RemoteRESTfulTestServiceProxy.class);
 	private String url;
 

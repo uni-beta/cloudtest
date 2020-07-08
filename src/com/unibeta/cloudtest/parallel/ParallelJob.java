@@ -13,7 +13,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudTestOutput;
@@ -40,7 +41,7 @@ import com.unibeta.vrules.utils.CommonUtils;
  */
 public class ParallelJob {
 
-	static Logger log = Logger.getLogger(ParallelJob.class);
+	static Logger log = LoggerFactory.getLogger(ParallelJob.class);
 
 	/**
 	 * Invoke parallel computing among all slave sites with indicate whether need

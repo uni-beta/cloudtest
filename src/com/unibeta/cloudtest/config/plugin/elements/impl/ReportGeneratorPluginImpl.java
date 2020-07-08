@@ -20,7 +20,6 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -29,6 +28,8 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -96,7 +97,7 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 	// private static final int MAX_ERROR_MSG_LENGTH = 60;
 	protected static String CURRENT_REPORT_PATH_NAME = REPORT_PATH_NAME + File.separator + "default";
 
-	private static Logger log = Logger.getLogger(CloudTestReportor.class);
+	private static Logger log = LoggerFactory.getLogger(CloudTestReportor.class);
 
 	// protected XStream xstream = new XStream(new DomDriver());
 
@@ -186,7 +187,7 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 					try {
 						o = (CloudTestOutput) ObjectDigester.fromXMLFile(f.getPath());
 					} catch (Exception e) {
-						log.error(e);
+						log.error(e.getMessage(),e);
 					}
 
 					if (null == o || null == o.getTestCaseResults() || null == o.getResultStatistics()) {

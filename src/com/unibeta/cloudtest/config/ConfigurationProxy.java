@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudTestInput;
 import com.unibeta.cloudtest.CloudTestInput.CloudTestParameter;
@@ -30,7 +31,7 @@ public class ConfigurationProxy {
     private static String rootFolderName = "cloudtest";
     private static boolean homePathWarningLogged = false;
 
-    private static Logger logger = Logger.getLogger(ConfigurationProxy.class);
+    private static Logger logger = LoggerFactory.getLogger(ConfigurationProxy.class);
     @SuppressWarnings("unused")
     private static boolean initStatus = initCommonConfig();
 

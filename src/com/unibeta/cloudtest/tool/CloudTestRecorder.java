@@ -1,14 +1,18 @@
 package com.unibeta.cloudtest.tool;
 
+import static com.unibeta.cloudtest.tool.Java2TestCases.BR;
+import static com.unibeta.cloudtest.tool.Java2TestCases.NEW_JAVA_UTIL_DATE_TO_STRING;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.config.CloudTestCase;
 import com.unibeta.cloudtest.config.CloudTestCase.Case;
@@ -23,7 +27,6 @@ import com.unibeta.cloudtest.util.CloudTestUtils;
 import com.unibeta.cloudtest.util.ObjectDigester;
 import com.unibeta.vrules.parsers.ObjectSerializer;
 import com.unibeta.vrules.utils.XmlUtils;
-import static com.unibeta.cloudtest.tool.Java2TestCases.*;
 
 /**
  * CloudTest recorder is AOP oriented, pointcut into particular aspect that has
@@ -67,7 +70,7 @@ import static com.unibeta.cloudtest.tool.Java2TestCases.*;
  */
 public class CloudTestRecorder {
 
-    private static Logger log = Logger.getLogger(CloudTestRecorder.class);
+    private static Logger log = LoggerFactory.getLogger(CloudTestRecorder.class);
 
     private static boolean stopped = true;
     private static CloudTestCase cloudTestCase = null;

@@ -20,11 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.util.CloudTestUtils;
 import com.unibeta.vrules.reflect.ObjectReflector;
@@ -45,7 +46,7 @@ public class XmlDataDigester {
 	private static final int RANDOM_STRING_MAX_LENGTH = 10;
 	private static final int NUMBERIC_TYPE_MAX_VALUE = 100;
 
-	private static Logger logger = Logger.getLogger(XmlDataDigester.class);
+	private static Logger logger = LoggerFactory.getLogger(XmlDataDigester.class);
 
 	private StringBuffer sb = new StringBuffer();
 

@@ -21,7 +21,6 @@
 	<classpathentry kind="lib" path="lib/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jettison-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.9.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.aop-3.1.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.asm-3.1.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.aspects-3.1.2.RELEASE.jar"/>
@@ -111,7 +110,6 @@
 	<classpathentry kind="lib" path="lib/xmlschema-core-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j-1.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-core-2.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/iText-2.1.5.jar"/>
@@ -180,6 +178,12 @@
 	<classpathentry kind="lib" path="lib/xerces-2.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/xercesSamples.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.12.0.jar"/>
-	<classpathentry kind="lib" path="lib/vRules4j-3.4.0.b202004071102PM.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.28.jar"/>
+	<classpathentry kind="lib" path="lib/fastjson-1.2.62.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.10.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.10.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.10.3.jar"/>
+	<classpathentry kind="lib" path="lib/unirest-java-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/vRules4j-3.4.0.b202007011119PM.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

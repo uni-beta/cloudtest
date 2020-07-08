@@ -1,6 +1,7 @@
 package com.unibeta.cloudtest.parallel.thread;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudCaseInput;
 import com.unibeta.cloudtest.CloudTestOutput;
@@ -13,7 +14,7 @@ import com.unibeta.vrules.utils.CommonUtils;
 
 public class CloudTestSingleServiceExecutor extends Thread implements Runnable {
 
-    private static Logger log = Logger
+    private static Logger log = LoggerFactory
             .getLogger(CloudTestSingleServiceExecutor.class);
 
     private CloudTestOutput cloudTestOutput = null;

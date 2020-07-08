@@ -1,11 +1,14 @@
 package com.unibeta.cloudtest.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.unibeta.cloudtest.config.CacheManagerFactory;
@@ -31,12 +34,15 @@ import groovy.lang.GroovyShell;
  */
 public class ObjectDigester {
 
+	private static final String JSON_ENGINE_FASTJSON = "fastjson";
+	private static final String JSON_ENGINE_JACKSON = "jackson";
+	
 	protected static ObjectDigester this_ = new ObjectDigester();
 	private static XStream x = new XStream(new DomDriver("UTF-8"));
 	private static ThreadLocal<Object> bshThreadLocal = new ThreadLocal<Object>();
 	private static ThreadLocal<Object> groovyThreadLocal = new ThreadLocal<Object>();
 	private static ThreadLocal<Map> runtimeDataThreadLocal = new ThreadLocal<Map>();
-	
+
 	private static Object getBeanSheelEngine() {
 
 		Interpreter v = (Interpreter) bshThreadLocal.get();
@@ -80,6 +86,100 @@ public class ObjectDigester {
 		return x.fromXML(XmlUtils.paserDocumentToString(XmlUtils.getDocumentByFileName(path)));
 	}
 
+	private static String jsonEngine = null;
+	private static Object jackson = null;
+
+	private static String getJsonEngine() throws Exception {
+		if (null != jsonEngine) {
+			return jsonEngine;
+		} else {
+			try {
+				Class.forName("com.alibaba.fastjson.JSON");
+				jsonEngine = JSON_ENGINE_FASTJSON;
+			} catch (ClassNotFoundException e) {
+				try {
+					Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
+					jsonEngine = JSON_ENGINE_JACKSON;
+					jackson = new ObjectMapper();
+				} catch (ClassNotFoundException e1) {
+					throw new Exception("either fastjson or jackson is requested as runtime json engine");
+				}
+			}
+
+			return jsonEngine;
+		}
+	}
+
+	public static Object fromJson(String json, Class type) throws Exception {
+
+		String jsonEngine2 = getJsonEngine();
+
+		if (JSON_ENGINE_FASTJSON.equalsIgnoreCase(jsonEngine2)) {
+			return JSON.parseObject(json, type);
+		} else {
+			ObjectMapper objectMapper = (ObjectMapper) jackson;
+			return objectMapper.readValue(json, type);
+		}
+
+	}
+
+	public static Object fromJsonFile(String jsonFile, Class type) throws Exception {
+
+		String jsonEngine2 = getJsonEngine();
+
+		if (CommonUtils.isNullOrEmpty(jsonFile)) {
+			return null;
+		}
+
+		String fullPath = null;
+		File f = new File(jsonFile);
+
+		if (f.isAbsolute()) {
+			fullPath = jsonFile;
+		} else {
+			fullPath = ConfigurationProxy.getCloudTestRootPath() + jsonFile;
+		}
+
+		String json = CloudTestUtils.readFileContent(fullPath);
+
+		if (JSON_ENGINE_FASTJSON.equalsIgnoreCase(jsonEngine2)) {
+			return JSON.parseObject(json, type);
+		} else {
+			ObjectMapper objectMapper =  (ObjectMapper) jackson;
+			return objectMapper.readValue(json, type);
+		}
+	}
+
+	public static String toJson(Object obj) throws Exception {
+
+		String jsonEngine2 = getJsonEngine();
+
+		if (JSON_ENGINE_FASTJSON.equalsIgnoreCase(jsonEngine2)) {
+			return JSON.toJSONString(obj);
+		} else {
+			ObjectMapper objectMapper = (ObjectMapper) jackson;
+			return objectMapper.writeValueAsString(obj);
+		}
+
+	}
+
+	public static void toJsonFile(Object obj,String jsonFile) throws Exception {
+
+		String jsonEngine2 = getJsonEngine();
+
+		FileOutputStream fos = new FileOutputStream(new File(jsonFile));
+		
+		if (JSON_ENGINE_FASTJSON.equalsIgnoreCase(jsonEngine2)) {
+			JSON.writeJSONString(fos, obj);
+		} else {
+			ObjectMapper objectMapper = (ObjectMapper) jackson;
+			objectMapper.writeValue(fos, obj);
+		}
+		
+		fos.close();
+
+	}
+	
 	/**
 	 * Convert xml string to object instance
 	 * 
@@ -203,7 +303,7 @@ public class ObjectDigester {
 					e);
 		}
 
-		GroovyShell bsh = (GroovyShell)getGroovyEngine();
+		GroovyShell bsh = (GroovyShell) getGroovyEngine();
 		for (String k : CacheManagerFactory.getThreadLocalInstance()
 
 				.keySet(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA)) {
@@ -240,12 +340,12 @@ public class ObjectDigester {
 					e);
 		}
 
-		Interpreter bsh = (Interpreter)getBeanSheelEngine();
+		Interpreter bsh = (Interpreter) getBeanSheelEngine();
 		for (String k : CacheManagerFactory.getThreadLocalInstance()
 				.keySet(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA)) {
 
-			bsh.set(k, CacheManagerFactory.getThreadLocalInstance().get(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA,
-					k));
+			bsh.set(k, CacheManagerFactory.getThreadLocalInstance()
+					.get(CacheManagerFactory.getThreadLocalInstance().CACHE_TYPE_RUNTIME_DATA, k));
 		}
 
 		Map<String, Object> vars = setDefaultRuntimeData();
@@ -369,7 +469,8 @@ public class ObjectDigester {
 
 			if (null != result) {
 
-				CacheManagerFactory.getGlobalCacheInstance().put(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
+				CacheManagerFactory.getGlobalCacheInstance().put(
+						CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
 						System.currentTimeMillis());
 
 				throw new Exception(
@@ -377,7 +478,8 @@ public class ObjectDigester {
 								+ fullPath + "], compiling fatal errors were found below:\n" + result);
 			}
 
-			CacheManagerFactory.getGlobalCacheInstance().put(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
+			CacheManagerFactory.getGlobalCacheInstance().put(
+					CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath,
 					new File(fullPath).lastModified());
 
 		}
@@ -397,8 +499,8 @@ public class ObjectDigester {
 	private static boolean isModified(String fullPath) {
 
 		File f = new File(fullPath);
-		Object o = CacheManagerFactory.getGlobalCacheInstance().get(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE,
-				fullPath);
+		Object o = CacheManagerFactory.getGlobalCacheInstance()
+				.get(CacheManagerFactory.getGlobalCacheInstance().CACHE_TYPE_SRC_FILE, fullPath);
 
 		if (null != o && (new Long(f.lastModified()).equals(new Long(o.toString())))) {
 			return false;

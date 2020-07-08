@@ -26,7 +26,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.config.CacheManagerFactory;
 import com.unibeta.vrules.constant.VRulesConstants;
@@ -40,7 +41,7 @@ import com.unibeta.vrules.utils.CommonUtils;
  */
 public class CloudTestClassLoader extends URLClassLoader {
 
-    private static Logger log = Logger.getLogger(CloudTestClassLoader.class);
+    private static Logger log = LoggerFactory.getLogger(CloudTestClassLoader.class);
 
     private String fileName = null;
     private String packageName = null;

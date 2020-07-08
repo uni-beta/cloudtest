@@ -1,7 +1,8 @@
 package com.unibeta.cloudtest.restful;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.CloudTestService;
@@ -22,7 +23,7 @@ public class LocalRESTfulTestController {
 	private static final String CLOUD_TEST_TAG = "cloudtest";
 	private static final String REQUEST_CLOUD_TEST_CASE = "</" + CLOUD_TEST_TAG
 			+ ">";
-	private static Logger log = Logger
+	private static Logger log = LoggerFactory
 			.getLogger(LocalRESTfulTestController.class);
 
 	/**

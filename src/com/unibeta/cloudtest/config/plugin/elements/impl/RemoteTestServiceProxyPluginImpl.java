@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.TestService;
 import com.unibeta.cloudtest.config.plugin.PluginConfig;
@@ -22,7 +23,7 @@ import com.unibeta.vrules.utils.CommonUtils;
 public class RemoteTestServiceProxyPluginImpl implements
         RemoteTestServiceProxyPlugin {
 
-    Logger log = Logger.getLogger(this.getClass());
+    Logger log = LoggerFactory.getLogger(this.getClass());
     
     public Map<String, TestService> create(String callType, Map<String, String> servers){
     	 

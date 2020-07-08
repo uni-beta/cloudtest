@@ -2,7 +2,9 @@
 1. Refined runtime classloader management and integration
 2. Improved performance
 3. Refined 'foreach' to support array[] type
-4. Released v1.7.0
+4. Upgraded log4j to slf4j
+5. Added json operations API in $CloudObject$ of com.unibeta.cloudtest.util.ObjectDigester
+6. Released v1.7.0
 
 [2019-07-13 v1.6.1]
 1. Fixed the parallel job process blocking issue when tasks count is less than servers count.

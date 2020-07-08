@@ -50,11 +50,12 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 
 import com.unibeta.cloudtest.CloudCaseInput;
@@ -69,7 +70,7 @@ import com.unibeta.vrules.utils.CommonUtils;
 public class CloudTestUtils {
 
 	private static final Project DEFAULT_PROJECT = new Project();
-	private static Logger log = Logger.getLogger(CloudTestUtils.class);
+	private static Logger log = LoggerFactory.getLogger(CloudTestUtils.class);
 	private static Map<String, List<Class>> interfaceMap = new HashMap<String, List<Class>>();
 
 	public static String printExceptionStackTrace(Throwable e) {

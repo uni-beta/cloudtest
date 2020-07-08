@@ -11,7 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudTestInput;
 import com.unibeta.cloudtest.CloudTestInput.CloudTestParameter;
@@ -41,7 +42,7 @@ public class RemoteParallelUtil {
 	private static final String DEFAULT_UPLOADING_BLOCK_MAX_SIZE = "1024";
 	private static final int ONE_KB = 1024;
 
-	static Logger log = Logger.getLogger(RemoteParallelUtil.class);
+	static Logger log = LoggerFactory.getLogger(RemoteParallelUtil.class);
 
 	public synchronized static String checkAndBackupDataToSlavesNode(Map<String, TestService> servers,Map<String, String> serversAddressMap) {
 

@@ -3,7 +3,8 @@ package com.unibeta.cloudtest.config.plugin.elements.impl;
 import javax.naming.InitialContext;
 import javax.transaction.UserTransaction;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.config.plugin.elements.UserTransactionPlugin;
@@ -13,7 +14,7 @@ public class UserTransactionPluginImpl implements UserTransactionPlugin {
 
     // private static final String JNDI_JAVA_COMP_USER_TRANSACTION =
     // "java:comp/UserTransaction";
-    private static Logger log = Logger
+    private static Logger log = LoggerFactory
             .getLogger(UserTransactionPluginImpl.class);
 
     public UserTransaction getUserTransaction() throws Exception {

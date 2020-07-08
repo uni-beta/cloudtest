@@ -24,7 +24,8 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.transaction.UserTransaction;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 
 import com.unibeta.cloudtest.CloudTestInput.CloudTestParameter;
@@ -71,7 +72,7 @@ public class CloudTestService implements TestService {
 	private static final String PARAMETER_TYPE_BY_XML_FILE = "1";
 	private static final String PARAMETER_TYPE_BY_VALUE = "0";
 
-	private static Logger logger = Logger.getLogger(CloudTestService.class);
+	private static Logger logger = LoggerFactory.getLogger(CloudTestService.class);
 
 	private static Pattern xmlValuePattern = Pattern.compile(REGEX_XML_EXPRESSION, Pattern.DOTALL);
 	private static Queue<String> assertQueue = new LinkedBlockingQueue<String>();

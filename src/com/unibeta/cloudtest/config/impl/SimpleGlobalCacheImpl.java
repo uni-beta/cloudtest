@@ -73,7 +73,6 @@ public class SimpleGlobalCacheImpl implements CacheManager {
 		return globalCacheMap.get(key);
 	}
 
-	@Override
 	public boolean isThreadLocalCache() {
 		// always in global cache mode.
 		return true;

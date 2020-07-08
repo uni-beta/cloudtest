@@ -2,10 +2,11 @@ package com.unibeta.cloudtest.config.plugin.elements.impl;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
@@ -24,7 +25,7 @@ public class JUnitReportGeneratorPluginImpl extends ReportGeneratorPluginImpl
     private static final String PROPERTY_CLOUDTEST_REPORT_XML = "cloudtest.report.xml";
     private static final String ANT_JUNIT_REPORT_XML = "junit-report.xml";
  
-    private static final Logger log = Logger
+    private static final Logger log = LoggerFactory
             .getLogger(JUnitReportGeneratorPluginImpl.class);
     
     static{
