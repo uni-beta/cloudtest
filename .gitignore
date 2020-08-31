@@ -8,3 +8,5 @@ cloudtest-soapui-project.xml
 build/**
 /javadoc/
 build/History-Log.txt
+/target/
+test

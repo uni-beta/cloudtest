@@ -174,10 +174,15 @@ public class PluginConfigProxy {
 	}
 
 	private static void initParamValueMap() throws Exception {
-
+		
+		pluginConfig = loadGlobalPluginConfig();
+		if(pluginConfig == null){
+			return;
+		}
+		
+		List<Param> list = pluginConfig.param;
 		paramValueMap.clear();
-		List<Param> list = loadGlobalPluginConfig().param;
-
+		
 		for (Param e : list) {
 			if (!CommonUtils.isNullOrEmpty(e.name)) {
 				paramValueMap.put(e.name.toUpperCase(), e.value.trim());
@@ -224,6 +229,10 @@ public class PluginConfigProxy {
 	private static void initCloudTestPluginInstancesMap() throws Exception {
 
 		pluginConfig = loadGlobalPluginConfig();
+		if(null == pluginConfig){
+			return;
+		}
+		
 		List<Plugin> list = pluginConfig.plugin;
 		cloudTestPluginInstancesMap.clear();
 
