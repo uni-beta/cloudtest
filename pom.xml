@@ -109,7 +109,7 @@
 			<artifactId>vRules4j</artifactId>
 			<version>3.4.0-b20200901001601</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/vRules4j-3.4.0-b20200901001601.jar
+			<systemPath>${project.basedir}/lib/vRules4j-3.4.0.b20200902210100.jar
 			</systemPath>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
