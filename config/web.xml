@@ -1,0 +1,43 @@
+<!-- Add below configuration to web.xml to enable cloudtest -->
+<web-app>
+	<!-- enable cloudtest start -->
+	<servlet>
+		<servlet-name>CloudTestServlet</servlet-name>
+		<servlet-class>com.unibeta.cloudtest.servlet.CloudTestServlet
+		</servlet-class>
+		<init-param>
+			<param-name>CLOUDTEST_HOME$PathProvider</param-name>
+			<param-value>com.unibeta.cloudtest.config.impl.CLOUDTEST_HOME$PathProviderImpl
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ROOT_FOLDER_NAME</param-name>
+			<param-value>cloudtest</param-value>
+		</init-param>
+		<init-param>
+			<param-name>AUTHORIZATION_ENABLED</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>AUTHORIZATION_TOKEN</param-name>
+			<!-- keep empty by default, system will generate token and print out in console -->
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>WEBSERVICE_ENDPOINT_ADDRESS</param-name>
+			<param-value>/cloudtest</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CloudTestServlet</servlet-name>
+		<url-pattern>/restful/cloudtest/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>vRules4jServlet</servlet-name>
+		<servlet-class>com.unibeta.vrules.servlets.VRules4jServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<!-- enable cloudtest end -->
+</web-app>

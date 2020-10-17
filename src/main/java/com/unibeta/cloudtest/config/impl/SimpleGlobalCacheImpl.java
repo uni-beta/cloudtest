@@ -74,7 +74,7 @@ public class SimpleGlobalCacheImpl implements CacheManager {
 	}
 
 	public boolean isThreadLocalCache() {
-		// always in global cache mode.
-		return true;
+		// always in global cache mode, not thread local.
+		return false;
 	}
 }

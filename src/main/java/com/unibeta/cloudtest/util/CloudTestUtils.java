@@ -64,6 +64,7 @@ import com.unibeta.cloudtest.CloudTestOutput.ResultStatistics;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
+import com.unibeta.cloudtest.config.plugin.elements.SpringBeanFactoryPlugin;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.vrules.utils.CommonUtils;
 
@@ -790,7 +791,10 @@ public class CloudTestUtils {
 
 		try {
 
-			obj = CloudTestPluginFactory.getSpringBeanFactoryPlugin().getBean(beanId);
+			SpringBeanFactoryPlugin springBeanFactoryPlugin = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
+			if (null != springBeanFactoryPlugin) {
+				obj = springBeanFactoryPlugin.getBean(beanId);
+			}
 
 		} catch (Exception e1) {
 

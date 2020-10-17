@@ -26,7 +26,6 @@ import javax.transaction.UserTransaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import com.unibeta.cloudtest.CloudTestInput.CloudTestParameter;
 import com.unibeta.cloudtest.assertion.AssertResult;
@@ -39,6 +38,7 @@ import com.unibeta.cloudtest.config.CloudTestCase.Case;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
+import com.unibeta.cloudtest.config.plugin.elements.SpringBeanFactoryPlugin;
 import com.unibeta.cloudtest.config.plugin.elements.UserTransactionPlugin;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.cloudtest.parallel.thread.CloudTestSingleServiceExecutor;
@@ -855,7 +855,9 @@ public class CloudTestService implements TestService {
 					}
 
 					for (Case c : dependsCloudTestCase.testCase) {
-						if (!isIgnoreCase(c.ignore)) {
+						
+						Boolean ignore = isIgnoreCase(c.ignore);
+						if (!Boolean.TRUE.equals(ignore)) {
 							this.executeDependsCases(c);
 							invoke(c);
 						}
@@ -1625,7 +1627,7 @@ public class CloudTestService implements TestService {
 					Thread.currentThread().getContextClassLoader()
 							.loadClass("org.springframework.beans.factory.BeanFactory");
 
-					BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
+					SpringBeanFactoryPlugin beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
 					beanObject = beanFactory.getBean(className);
 					c = beanObject.getClass();
@@ -1825,7 +1827,7 @@ public class CloudTestService implements TestService {
 				Class springClass = Thread.currentThread().getContextClassLoader()
 						.loadClass("org.springframework.beans.factory.BeanFactory");
 
-				BeanFactory beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
+				SpringBeanFactoryPlugin beanFactory = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
 
 				beanObject = beanFactory.getBean(className);
 				clazz = beanObject.getClass();

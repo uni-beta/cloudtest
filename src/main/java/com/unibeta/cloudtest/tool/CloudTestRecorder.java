@@ -22,6 +22,7 @@ import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Recorder;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.SignatureRegex;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
+import com.unibeta.cloudtest.config.plugin.elements.SpringBeanFactoryPlugin;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.cloudtest.util.CloudTestUtils;
 import com.unibeta.cloudtest.util.ObjectDigester;
@@ -141,11 +142,17 @@ public class CloudTestRecorder {
 
             CloudTestCase.Case testCase = new CloudTestCase.Case();
 
-            String[] beanNamesForType = CloudTestPluginFactory
-                    .getSpringBeanFactoryPlugin().getBeanNamesForType(
-                            pjp.getSignature().getDeclaringType());
-
-            if (null != beanNamesForType && beanNamesForType.length > 0) {
+            SpringBeanFactoryPlugin springBeanFactoryPlugin = CloudTestPluginFactory
+                    .getSpringBeanFactoryPlugin();
+            
+			String[] beanNamesForType = null;
+			
+			if (null != springBeanFactoryPlugin) {
+				beanNamesForType = springBeanFactoryPlugin
+						.getBeanNamesForType(pjp.getSignature()
+								.getDeclaringType());
+			}
+			if (null != beanNamesForType && beanNamesForType.length > 0) {
                 testCase.className = beanNamesForType[0];
             } else {
                 testCase.className = pjp.getSignature().getDeclaringTypeName();

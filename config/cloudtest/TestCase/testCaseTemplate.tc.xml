@@ -22,14 +22,4 @@ For parameter's value, both attribute and element style are acceptable.
 			<value>""</value>
 		</parameter>
 	</testCase>
-	<testCase id="CloudTestService_doTest" assertId ="" returnFlag="true" returnTo="" desc="CloudTestService is working">
-        <className>com.unibeta.cloudtest.CloudTestService</className>
-        <methodName>doTest</methodName>
-        <parameter>
-			<name>cloud test input</name>
-			<dataType>com.unibeta.cloudtest.CloudTestInput</dataType>
-			<parameterType>1</parameterType>
-			<value>TestData/testDataExample.xml</value>
-		</parameter>
-    </testCase>
 </cloudTestCase>

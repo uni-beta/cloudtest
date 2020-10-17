@@ -20,6 +20,7 @@ import com.unibeta.cloudtest.config.CloudTestCase.Case;
 import com.unibeta.cloudtest.config.CloudTestCase.Case.Parameter;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
+import com.unibeta.cloudtest.config.plugin.elements.SpringBeanFactoryPlugin;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.cloudtest.util.CloudTestUtils;
 import com.unibeta.cloudtest.util.ObjectDigester;
@@ -257,10 +258,13 @@ public class Java2TestCases {
 
     private static String getBeanNameForType(Class clazz) {
 
-        String[] names = CloudTestPluginFactory.getSpringBeanFactoryPlugin()
-                .getBeanNamesForType(clazz);
-
-        if (names != null && names.length > 0) {
+        SpringBeanFactoryPlugin springBeanFactoryPlugin = CloudTestPluginFactory.getSpringBeanFactoryPlugin();
+		String[] names = null;
+		
+		if (null != springBeanFactoryPlugin ) {
+			names = springBeanFactoryPlugin.getBeanNamesForType(clazz);
+		}
+		if (names != null && names.length > 0) {
             return names[0];
         } else {
             return clazz.getCanonicalName();

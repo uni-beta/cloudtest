@@ -77,7 +77,7 @@ public class SimpleThreadLocalCacheImpl implements CacheManager {
 	}
 
 	public boolean isThreadLocalCache() {
-		// always not support threadlocal mode.
-		return false;
+		// always support threadlocal mode.
+		return true;
 	}
 }

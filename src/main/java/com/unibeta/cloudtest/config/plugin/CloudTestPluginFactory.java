@@ -61,7 +61,13 @@ public class CloudTestPluginFactory {
                     .getCloudTestPluginInstance(SpringBeanFactoryPlugin.class
                             .getName());
         } catch (Exception e) {
-            cloudTestPluginInstance = new SpringBeanFactoryPluginImpl();
+        	try {
+				Class.forName("org.springframework.beans.factory.BeanFactory");
+				cloudTestPluginInstance = new SpringBeanFactoryPluginImpl();
+			} catch (ClassNotFoundException e1) {
+				cloudTestPluginInstance = null;
+			}
+            
         }
 
         return cloudTestPluginInstance;

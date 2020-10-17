@@ -36,7 +36,6 @@ import com.unibeta.vrules.utils.CommonUtils;
 public class RemoteRESTfulTestServiceProxy implements TestService {
 
 	
-	
 	private static Logger log = LoggerFactory
 			.getLogger(RemoteRESTfulTestServiceProxy.class);
 	private String url;
@@ -87,12 +86,18 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 			header.put(CloudTestConstants.CLOUDTEST_OPERATION,
 					CloudTestConstants.CLOUDTEST_OPERATION_CLOUDTEST);
 			
-			if ("true".equalsIgnoreCase(PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_PARALLEL_RESTFUL_CHECK_MD5_ENABLE))) {
+			// MD5 check had been disabled
+			/*if ("true".equalsIgnoreCase(PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_PARALLEL_RESTFUL_CHECK_MD5_ENABLE))) {
 				header.put(CloudTestConstants.HTTP_HEADER_CONTENT_LENGTH, ""
 						+ request.length);
 				header.put(CloudTestConstants.HTTP_HEADER_CONTENT_MD5,
 						CloudTestUtils.getMD5code(request));
 				
+			}*/
+			
+			String authToken = PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_PARALLEL_AUTH_TOKEN);
+			if(!CommonUtils.isNullOrEmpty(authToken)) {
+				header.put(CloudTestConstants.AUTH_AUTHORIZATION, CloudTestConstants.AUTH_BEARER + authToken);
 			}
 			
 			responses = HttpClientUtils.post(url, header, request);

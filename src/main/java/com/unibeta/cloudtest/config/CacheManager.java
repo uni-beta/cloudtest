@@ -34,6 +34,10 @@ public interface CacheManager {
      */
     public static String CACHE_TYPE_TASKS_QUEUE = "tasks_queue";
     /**
+     * runtime_data
+     */
+    public static String CACHE_TYPE_AUTH_TOKEN = "auth_token";
+    /**
      * running_status
      */
     public static String CACHE_TYPE_RUNNING_STATUS = "running_status";

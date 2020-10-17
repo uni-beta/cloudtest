@@ -174,15 +174,15 @@ public class PluginConfigProxy {
 	}
 
 	private static void initParamValueMap() throws Exception {
-
+		
 		pluginConfig = loadGlobalPluginConfig();
-		if (pluginConfig == null) {
+		if(pluginConfig == null){
 			return;
 		}
-
+		
 		List<Param> list = pluginConfig.param;
 		paramValueMap.clear();
-
+		
 		for (Param e : list) {
 			if (!CommonUtils.isNullOrEmpty(e.name)) {
 				paramValueMap.put(e.name.toUpperCase(), e.value.trim());
@@ -229,10 +229,10 @@ public class PluginConfigProxy {
 	private static void initCloudTestPluginInstancesMap() throws Exception {
 
 		pluginConfig = loadGlobalPluginConfig();
-		if (null == pluginConfig) {
+		if(null == pluginConfig){
 			return;
 		}
-
+		
 		List<Plugin> list = pluginConfig.plugin;
 		cloudTestPluginInstancesMap.clear();
 
@@ -284,8 +284,7 @@ public class PluginConfigProxy {
 							XmlUtils.getDocumentByFileName(ConfigurationProxy.getConfigurationFilePath())),
 					PluginConfig.class);
 		} catch (Exception e) {
-			logger.warn("loading PluginConfig.xml failed from '" + ConfigurationProxy.getConfigurationFilePath()
-					+ "', caused by " + e.getMessage(), e);
+			logger.warn("PluginConfig.xml is not in place, " + e.getMessage());
 		}
 
 		return pluginConfig;

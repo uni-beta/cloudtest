@@ -396,10 +396,12 @@ public class ObjectDigester {
 		try {
 			PluginConfig config = PluginConfigProxy.getGlobalPluginConfig();
 
-			for (PluginConfig.Plugin p : config.plugin) {
-				if (p.id.startsWith("$") && p.id.endsWith("$")) {
-					map.put(p.id, PluginConfigProxy.getPluginObject(p.id));
-				}
+			if (null != config) {
+				for (PluginConfig.Plugin p : config.plugin) {
+					if (p.id.startsWith("$") && p.id.endsWith("$")) {
+						map.put(p.id, PluginConfigProxy.getPluginObject(p.id));
+					}
+				} 
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

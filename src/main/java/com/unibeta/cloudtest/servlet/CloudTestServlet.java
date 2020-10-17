@@ -3,6 +3,7 @@ package com.unibeta.cloudtest.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,12 +17,15 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.CloudTestService;
 import com.unibeta.cloudtest.config.CLOUDTEST_HOME$PathProvider;
+import com.unibeta.cloudtest.config.CacheManager;
+import com.unibeta.cloudtest.config.CacheManagerFactory;
 import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
@@ -55,6 +59,14 @@ import com.unibeta.vrules.utils.CommonUtils;
  *             &lt;param-value&gt;cloudtest&lt;/param-value&gt;
  *         &lt;/init-param&gt;
  *         &lt;init-param&gt;
+ *             &lt;param-name&gt;AUTHORIZATION_ENABLED&lt;/param-name&gt;
+ *             &lt;param-value&gt;true&lt;/param-value&gt;
+ *         &lt;/init-param&gt;
+ *         &lt;init-param&gt;
+ *             &lt;param-name&gt;AUTHORIZATION_TOKEN&lt;/param-name&gt;
+ *             &lt;param-value&gt;AUTHORIZATION_TOKEN&lt;/param-value&gt;
+ *         &lt;/init-param&gt;
+ *         &lt;init-param&gt;
  *             &lt;param-name&gt;WEBSERVICE_ENDPOINT_ADDRESS&lt;/param-name&gt;
  *             &lt;param-value&gt;/cloudtest&lt;/param-value&gt;
  *         &lt;/init-param&gt;
@@ -62,7 +74,7 @@ import com.unibeta.vrules.utils.CommonUtils;
  *     &lt;/servlet&gt;
  *     &lt;servlet-mapping&gt;
  *         &lt;servlet-name&gt;CloudTestServlet&lt;/servlet-name&gt;
- *         &lt;url-pattern&gt;/cloudtest/*&lt;/url-pattern&gt;
+ *         &lt;url-pattern&gt;/restful/cloudtest/*&lt;/url-pattern&gt;
  *      &lt;/servlet-mapping&gt;
  *     &lt;servlet&gt;
  *         &lt;servlet-name&gt;vRules4jServlet&lt;/servlet-name&gt;
@@ -75,6 +87,7 @@ import com.unibeta.vrules.utils.CommonUtils;
  */
 public class CloudTestServlet extends HttpServlet {
 
+	
 	private static final String WEBSERVICE_ENDPOINT = "WEBSERVICE_ENDPOINT_ADDRESS";
 	private static final String PARAMETER_CLOUDTEST_HOME = CLOUDTEST_HOME$PathProvider.class.getSimpleName();
 	private static final String PARAMETER_CLOUDTEST_ROOT_FOLDER_NAME = "ROOT_FOLDER_NAME";
@@ -83,18 +96,73 @@ public class CloudTestServlet extends HttpServlet {
 	private static Log log = LogFactory.getLog(CloudTestServlet.class);
 
 	private static final String DEFAULT_UPLOADING_BLOCK_MAX_SIZE = "1024";
+	private static String authToken = null;
+	private static String authEnabled = "false";
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+		processAuthToken(request);
+
 		String operation = request.getHeader(CloudTestConstants.CLOUDTEST_OPERATION);
 
-		if (operation != null && CloudTestConstants.CLOUDTEST_OPERATION_FILE_UPLOAD.equals(operation.toLowerCase())) {
-			processFileUploadRequest(request, response);
+		if (Boolean.TRUE.equals(CacheManagerFactory.getThreadLocalInstance().get(CacheManager.CACHE_TYPE_AUTH_TOKEN,
+				CacheManager.CACHE_TYPE_AUTH_TOKEN))) {
+			if (operation != null && CloudTestConstants.CLOUDTEST_OPERATION_FILE_UPLOAD.equals(operation.toLowerCase())) {
+				processFileUploadRequest(request, response);
+			} else {
+				processCloudTestRequest(request, response);
+			}
 		} else {
-			processCloudTestRequest(request, response);
+			processInvalidTokenRequest(request, response);
+		}
+	}
+
+	private void processInvalidTokenRequest(HttpServletRequest request, HttpServletResponse response) {
+		CloudTestOutput result = new CloudTestOutput();
+
+		result.setStatus(false);
+		result.setErrorMessage("cloudtest request permission denied due to invalid token");
+
+		try {
+			String responseXml = ObjectSerializer.marshalToXml(result);
+
+			response.setContentType("text/xml;charset=UTF-8");
+			response.getWriter().write(StringEscapeUtils.unescapeXml(responseXml));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
+		log.debug("cloudtest request permission denied due to invalid token, request from '" + request.getRemoteAddr()
+				+ "'");
+	}
+
+	private void processAuthToken(HttpServletRequest request) {
+		
+		String token = request.getHeader(CloudTestConstants.AUTH_AUTHORIZATION);
+		
+		if (!CommonUtils.isNullOrEmpty(authToken)) {
+			
+			if(!CommonUtils.isNullOrEmpty(token) && token.trim().length() > CloudTestConstants.AUTH_BEARER.length()) {
+				String inputToken = token.substring(CloudTestConstants.AUTH_BEARER.length());
+				
+				if(authToken.equals(inputToken)) {
+					CacheManagerFactory.getThreadLocalInstance().put(CacheManager.CACHE_TYPE_AUTH_TOKEN,
+							CacheManager.CACHE_TYPE_AUTH_TOKEN, true);
+				}else {
+					CacheManagerFactory.getThreadLocalInstance().put(CacheManager.CACHE_TYPE_AUTH_TOKEN,
+							CacheManager.CACHE_TYPE_AUTH_TOKEN, false);
+				}
+			}else {
+				CacheManagerFactory.getThreadLocalInstance().put(CacheManager.CACHE_TYPE_AUTH_TOKEN,
+						CacheManager.CACHE_TYPE_AUTH_TOKEN, false);
+			}
+			
+		}else {
+			CacheManagerFactory.getThreadLocalInstance().put(CacheManager.CACHE_TYPE_AUTH_TOKEN,
+					CacheManager.CACHE_TYPE_AUTH_TOKEN, true);
+		}
 	}
 
 	private void processCloudTestRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -198,6 +266,21 @@ public class CloudTestServlet extends HttpServlet {
 			if (!CommonUtils.isNullOrEmpty(rootFolderName)) {
 				ConfigurationProxy.setRootFolderName(rootFolderName.trim());
 			}
+			
+			authEnabled = conf.getInitParameter("AUTHORIZATION_ENABLED");
+			if("true".equalsIgnoreCase(authEnabled)) {
+				authToken = conf.getInitParameter("AUTHORIZATION_TOKEN");
+				
+				if(CommonUtils.isNullOrEmpty(authToken)) {
+					authToken = UUID.randomUUID().toString();
+					
+					log.info("cloudtest authorization token is generated as below:");
+					log.info("**************************AUTHORIZATION_TOKEN*****************************");
+					log.info(authToken);
+					log.info("**************************AUTHORIZATION_ENABLED***************************");
+				}
+			}
+			
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		} finally {
@@ -234,7 +317,7 @@ public class CloudTestServlet extends HttpServlet {
 				address = CloudTestPluginFactory.getParamConfigServicePlugin().getWebServiceEndpointAddress();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.info("get 'WebServiceEndpointAddress' failed");
+				log.warn("get 'WebServiceEndpointAddress' failed");
 			}
 		}
 
@@ -262,7 +345,7 @@ public class CloudTestServlet extends HttpServlet {
 
 	private void processFileUploadRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		// 检测是不是存在上传文件
+		
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		String operation = request.getHeader(CloudTestConstants.CLOUDTEST_OPERATION);
 
@@ -280,6 +363,11 @@ public class CloudTestServlet extends HttpServlet {
 			File tempFolder = new File(ConfigurationProxy.getCLOUDTEST_HOME() + "/temp/");
 			if (!tempFolder.exists()) {
 				tempFolder.mkdirs();
+				
+				//used for permission checking. if no permission, throw 'permission denied'exception
+				File tempCheckFile = new File(tempFolder + "/check.tmp"); 
+				tempCheckFile.createNewFile();
+				tempCheckFile.delete();
 			}
 
 			// the temp dir is over Threshold size.

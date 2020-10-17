@@ -99,8 +99,11 @@ public class LocalRESTfulTestController {
 				} else {
 					output = result;
 				}
+				
 				output.setErrorMessage(StringEscapeUtils.escapeXml(output
 						.getErrorMessage()));
+				
+				CloudTestUtils.processResultStatistics(output, false);
 				response = ObjectSerializer.marshalToXml(output);
 
 			} catch (Exception e) {

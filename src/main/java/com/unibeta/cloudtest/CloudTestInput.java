@@ -3,6 +3,9 @@ package com.unibeta.cloudtest;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.unibeta.cloudtest.config.bind.XmlCDATAAdatper;
 import com.unibeta.cloudtest.util.CloudTestUtils;
 
 /**
@@ -94,6 +97,7 @@ public class CloudTestInput implements Serializable{
             this.parameterType = parameterType;
         }
 
+        @XmlJavaTypeAdapter(XmlCDATAAdatper.class)
         public String getValue() {
 
             return CloudTestUtils.trimString(value);

@@ -1,10 +1,15 @@
-[2020-04-06 v1.7.0]
+[2020-11-06 v1.7.0]
 1. Refined runtime classloader management and integration
 2. Improved performance
 3. Refined 'foreach' to support array[] type
 4. Upgraded log4j to slf4j
 5. Added json operations API in $CloudObject$ of com.unibeta.cloudtest.util.ObjectDigester
-6. Released v1.7.0
+6. Add Authorization management with token. for example:
+		<init-param>
+			<param-name>AUTHORIZATION_ENABLED</param-name>
+			<param-value>true</param-value>
+		</init-param>
+7. Released v1.7.0
 
 [2019-07-13 v1.6.1]
 1. Fixed the parallel job process blocking issue when tasks count is less than servers count.
@@ -207,11 +212,11 @@
 
 [2013-04-11]
 1. External imports supported.
-	¡®imports¡® attribute under cloudTestCase can import external case file to current runtime life-cycle.
-		1£®¡®./¡¯ stands for current folder
-		2£®¡®../¡¯stands for parent folder
-		3£®¡®../../¡¯ stands for parent¡¯s parent folder, just as Linux file operation command 
-		4£®Multiple case files can be split by ¡®,¡¯ or ¡®;¡¯
+	ï¿½ï¿½importsï¿½ï¿½ attribute under cloudTestCase can import external case file to current runtime life-cycle.
+		1ï¿½ï¿½ï¿½ï¿½./ï¿½ï¿½ stands for current folder
+		2ï¿½ï¿½ï¿½ï¿½../ï¿½ï¿½stands for parent folder
+		3ï¿½ï¿½ï¿½ï¿½../../ï¿½ï¿½ stands for parentï¿½ï¿½s parent folder, just as Linux file operation command 
+		4ï¿½ï¿½Multiple case files can be split by ï¿½ï¿½,ï¿½ï¿½ or ï¿½ï¿½;ï¿½ï¿½
 	e.g,
 	<cloudTestCase assertRuleFile="DataTypeTest.assert.xml" imports="./DataTypeTest1.tc.xml,../DataTypeTest2.tc.xml">
 

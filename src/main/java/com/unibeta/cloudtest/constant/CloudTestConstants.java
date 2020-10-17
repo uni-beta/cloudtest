@@ -414,7 +414,8 @@ public class CloudTestConstants {
 	public static final String CLOUDTEST_PARALLEL_REMOTE_UPLOAD_DATA_PACKAGE_MAX_SIZE = "cloudtest.parallel.remote.upload.data.package.max_size";
 	public static final String CLOUDTEST_PARALLEL_REMOTE_UPLOAD_SERVICE_ENDPOINT = "cloudtest.parallel.remote.upload.service.endpoint";
 	public static final String CLOUDTEST_PARALLEL_RESTFUL_CHECK_MD5_ENABLE = "cloudtest.parallel.restful.check_md5.enable";
-
+	public static final String CLOUDTEST_PARALLEL_AUTH_TOKEN = "cloudtest.parallel.auth.token";
+	
 	public static final String FILE_UPLOAD_TARGET_FILE_PATH = "targetFilePath";
 	public static final String CLOUDTEST_OPERATION_FILE_UPLOAD = "file-upload";
 	public static final String CLOUDTEST_OPERATION = "cloudtest-operation";
@@ -423,4 +424,6 @@ public class CloudTestConstants {
 	public static final String CLOUDTEST_SYSTEM_CACHE_TYPE_EHCACHE = "ehcache";
 	public static final String CLOUDTEST_SYSTEM_CACHE_TYPE = "cloudtest.system.cache_type";
 
+	public static final String AUTH_AUTHORIZATION = "Authorization";
+	public static final String AUTH_BEARER = "Bearer ";
 }
