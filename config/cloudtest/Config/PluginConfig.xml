@@ -93,7 +93,7 @@
 	<param name="cloudtest.parallel.remote.upload.data.package.max_size" value="1024"/>
 	<!--cloudtest servlet context uri for remote cases uploading, for example '/restful/cloudtest/upload', by default is empty -->
 	<param name="cloudtest.parallel.remote.upload.service.endpoint" value=""/>
-	<!-- default authorization token value of inside plain restful-->
+	<!-- authorization token for slave-nodes accessing-->
 	<param name="cloudtest.parallel.auth.token" value=""/>
 	
 	<param name="cloudtest.assert.pre_compile.enable" value="true"/>
