@@ -26,6 +26,7 @@ import com.unibeta.cloudtest.CloudTestInput;
 import com.unibeta.cloudtest.CloudTestOutput;
 import com.unibeta.cloudtest.TestService;
 import com.unibeta.cloudtest.CloudTestInput.CloudTestParameter;
+import com.unibeta.cloudtest.config.plugin.PluginConfigProxy;
 import com.unibeta.cloudtest.constant.CloudTestConstants;
 import com.unibeta.cloudtest.parallel.util.RemoteParallelUtil;
 import com.unibeta.cloudtest.restful.RemoteRESTfulTestServiceProxy;
@@ -146,7 +147,12 @@ public class HttpClientUtils {
 
 			httpPost.setHeader(CloudTestConstants.CLOUDTEST_OPERATION,
 					CloudTestConstants.CLOUDTEST_OPERATION_FILE_UPLOAD);
-
+			
+			String authToken = PluginConfigProxy.getParamValueByName(CloudTestConstants.CLOUDTEST_PARALLEL_AUTH_TOKEN);
+			if(!CommonUtils.isNullOrEmpty(authToken)) {
+				httpPost.setHeader(CloudTestConstants.AUTH_AUTHORIZATION, CloudTestConstants.AUTH_BEARER + authToken);
+			}
+			
 			FileBody file = new FileBody(new File(localFile));
 			StringBody targetFilePath = new StringBody(remoteFile, ContentType.create("text/plain", Consts.UTF_8));
 

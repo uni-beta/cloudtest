@@ -159,6 +159,10 @@ public class RemoteParallelUtil {
 		input.setMethodName("getRealPath");
 
 		CloudTestOutput output = testService.doTest(input);
+		
+		if(!output.getStatus()) {
+			throw new RuntimeException(output.getErrorMessage());
+		}
 
 		String h = (String) ObjectDigester.fromXML(output.getReturns());
 
