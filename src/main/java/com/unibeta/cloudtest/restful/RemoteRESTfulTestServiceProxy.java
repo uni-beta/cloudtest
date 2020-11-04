@@ -36,6 +36,8 @@ import com.unibeta.vrules.utils.CommonUtils;
 public class RemoteRESTfulTestServiceProxy implements TestService {
 
 	
+	private static final String UTF_8 = "UTF-8";
+	
 	private static Logger log = LoggerFactory
 			.getLogger(RemoteRESTfulTestServiceProxy.class);
 	private String url;
@@ -80,7 +82,7 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 		byte[] request = null;
 		byte[] responses = null;
 		try {
-			request = ObjectSerializer.marshalToXml(cloudTestCase).getBytes("UTF-8");
+			request = ObjectSerializer.marshalToXml(cloudTestCase).getBytes(UTF_8);
 
 			Map<String, String> header = new HashMap<String, String>();
 			header.put(CloudTestConstants.CLOUDTEST_OPERATION,
@@ -103,7 +105,7 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 			responses = HttpClientUtils.post(url, header, request);
 
 			output = (CloudTestOutput) ObjectSerializer.unmarshalToObject(
-					new String(responses), CloudTestOutput.class);
+					new String(responses,UTF_8), CloudTestOutput.class);
 
 		} catch (Exception e) {
 			e.printStackTrace();
