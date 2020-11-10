@@ -107,9 +107,9 @@
 		<dependency>
 			<groupId>com.unibeta</groupId>
 			<artifactId>vRules4j</artifactId>
-			<version>3.4.0.b20201102223215</version>
+			<version>3.4.0.b20201110225127</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/vRules4j-3.4.0.b20201102223215.jar
+			<systemPath>${project.basedir}/lib/vRules4j-3.4.0.b20201110225127.jar
 			</systemPath>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->

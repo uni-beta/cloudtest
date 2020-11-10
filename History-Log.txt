@@ -9,7 +9,8 @@
 			<param-name>AUTHORIZATION_ENABLED</param-name>
 			<param-value>true</param-value>
 		</init-param>
-7. Released v1.7.0
+7. Refined utf-8 encoding		
+8. Released v1.7.0
 
 [2019-07-13 v1.6.1]
 1. Fixed the parallel job process blocking issue when tasks count is less than servers count.
