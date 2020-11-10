@@ -4,13 +4,18 @@
 3. Refined 'foreach' to support array[] type
 4. Upgraded log4j to slf4j
 5. Added json operations API in $CloudObject$ of com.unibeta.cloudtest.util.ObjectDigester
-6. Add Authorization management with token. for example:
+6. Add Authorization management with token for restful in servlet. for example:
 		<init-param>
 			<param-name>AUTHORIZATION_ENABLED</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<init-param>
+             <param-name>AUTHORIZATION_TOKEN</param-name>
+             <param-value>AUTHORIZATION_TOKEN</param-value>
+        </init-param>
 7. Refined utf-8 encoding		
-8. Released v1.7.0
+8. Upgraded to maven project
+9. Released v1.7.0
 
 [2019-07-13 v1.6.1]
 1. Fixed the parallel job process blocking issue when tasks count is less than servers count.
