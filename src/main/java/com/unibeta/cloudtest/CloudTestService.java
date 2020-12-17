@@ -770,11 +770,11 @@ public class CloudTestService implements TestService {
 			Collections.sort(outputList, new CloudTestUtils.TestCaseOutputComparator());
 			output.setTestCaseResults(outputList);
 
-			if (CommonUtils.isNullOrEmpty(output.getErrorMessage())
-					&& (null == output.getTestCaseResults() || output.getTestCaseResults().size() == 0)) {
-				output.setErrorMessage(CLOUDTEST_ERROR_MESSAGE_NO_TEST_CASE_WAS_FOUND);
-				output.setStatus(false);
-			}
+//			if (CommonUtils.isNullOrEmpty(output.getErrorMessage())
+//					&& (null == output.getTestCaseResults() || output.getTestCaseResults().size() == 0)) {
+//				output.setErrorMessage(CLOUDTEST_ERROR_MESSAGE_NO_TEST_CASE_WAS_FOUND);
+//				output.setStatus(false);
+//			}
 
 			CacheManagerFactory.getThreadLocalInstance().clear();
 
