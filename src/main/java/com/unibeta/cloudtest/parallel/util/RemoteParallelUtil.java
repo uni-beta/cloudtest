@@ -44,7 +44,8 @@ public class RemoteParallelUtil {
 
 	static Logger log = LoggerFactory.getLogger(RemoteParallelUtil.class);
 
-	public synchronized static String checkAndBackupDataToSlavesNode(Map<String, TestService> servers,Map<String, String> serversAddressMap) {
+	public synchronized static String checkAndBackupDataToSlavesNode(Map<String, TestService> servers,
+			Map<String, String> serversAddressMap) {
 
 		StringBuffer sb = new StringBuffer();
 		Map<String, TestService> validServers = new HashMap<String, TestService>();
@@ -83,15 +84,15 @@ public class RemoteParallelUtil {
 					String remoteHomePath = RemoteParallelUtil.setupCloudHomePath(testService, null);
 
 					if (!CommonUtils.isNullOrEmpty(remoteHomePath)) {
-						
+
 						String address = null;
-						if(null == serversAddressMap){
+						if (null == serversAddressMap) {
 							address = getSlaverServerById(s).address;
-						}else{
+						} else {
 							address = serversAddressMap.get(s);
 						}
-						
-						executor.execute(new CaseDataUploadingThread(testService, s,address ,fileMap));
+
+						executor.execute(new CaseDataUploadingThread(testService, s, address, fileMap));
 						validServers.put(s, testService);
 
 					} else {
@@ -159,8 +160,8 @@ public class RemoteParallelUtil {
 		input.setMethodName("getRealPath");
 
 		CloudTestOutput output = testService.doTest(input);
-		
-		if(!output.getStatus()) {
+
+		if (!output.getStatus()) {
 			throw new RuntimeException(output.getErrorMessage());
 		}
 
@@ -171,7 +172,7 @@ public class RemoteParallelUtil {
 	}
 
 	public static String uploadToRemoteSlaveNode(TestService testService, String localFilePath, byte[] base64Code,
-			String remoteFilePath, String serverName,String testServiceAddress) {
+			String remoteFilePath, String serverName, String testServiceAddress) {
 
 		if (null == testService) {
 			testService = new CloudTestService();
@@ -184,14 +185,14 @@ public class RemoteParallelUtil {
 
 		String errorMsg = null;
 
-		errorMsg = uploading(localFilePath, remoteFilePath, serverName,testServiceAddress);
+		errorMsg = uploading(localFilePath, remoteFilePath, serverName, testServiceAddress);
 
 		if (!CommonUtils.isNullOrEmpty(errorMsg)) {
 
-			output = uploading(testService, base64Code, remoteFilePath, serverName,testServiceAddress);
+			output = uploading(testService, base64Code, remoteFilePath, serverName, testServiceAddress);
 			if (!output.getStatus()) {
 				errorMsg = errorMsg + "\n" + output.getErrorMessage();
-				log.error(errorMsg+ "\nBlocked-Distribution was also failed.");
+				log.error(errorMsg + "\nBlocked-Distribution was also failed.");
 				return errorMsg;
 			}
 
@@ -230,7 +231,8 @@ public class RemoteParallelUtil {
 
 	}
 
-	private static String uploading(String localFilePath, String remoteFilePath, String serverName,String testServiceAddress) {
+	private static String uploading(String localFilePath, String remoteFilePath, String serverName,
+			String testServiceAddress) {
 
 		String error = null;
 
@@ -293,7 +295,7 @@ public class RemoteParallelUtil {
 
 	@Deprecated
 	private static CloudTestOutput uploading(TestService testService, byte[] base64Code, String filePath,
-			String serverName,String testServiceAddress) {
+			String serverName, String testServiceAddress) {
 
 		CloudTestInput input;
 		List<CloudTestParameter> paras;
@@ -480,17 +482,19 @@ public class RemoteParallelUtil {
 		List<CloudTestParameter> paras = new ArrayList<CloudTestInput.CloudTestParameter>();
 
 		if (remoteCloudTestHome == null) {
-			remoteCloudTestHome = "/cloud_tests/" + ConfigurationProxy.getOsUserName();
+			String parent = f.getParent() != null ? f.getParent()
+					: System.getProperty("java.io.tmpdir") + File.separator;
+			remoteCloudTestHome = parent + "/cloud_tests/" + ConfigurationProxy.getOsUserName();
 		}
 
-		String wrapedHomePath = CloudTestUtils.wrapFilePath(f.getParent() + remoteCloudTestHome);
+		String wrapedHomePath = CloudTestUtils.wrapFilePath(remoteCloudTestHome);
 		paras.add(buildParamater("string", ObjectDigester.toXML(wrapedHomePath)));
 		input.setParameter(paras);
 
 		CloudTestOutput output = testService.doTest(input);
 		input.setParameter(null);
 
-		// output = refreshCloudTestContext(testService);
+		//output = refreshCloudTestContext(testService);
 
 		return wrapedHomePath;
 	}
@@ -611,7 +615,8 @@ public class RemoteParallelUtil {
 		String testServiceAddress;
 		Map<String, byte[]> fileMap;
 
-		public CaseDataUploadingThread(TestService testService, String name,String address, Map<String, byte[]> fileMap) {
+		public CaseDataUploadingThread(TestService testService, String name, String address,
+				Map<String, byte[]> fileMap) {
 
 			this.testService = testService;
 			this.testServiceName = name;
@@ -622,15 +627,15 @@ public class RemoteParallelUtil {
 		public void run() {
 
 			try {
-				this.uploadToSingleNode(this.testService, this.testServiceName,testServiceAddress, this.fileMap);
+				this.uploadToSingleNode(this.testService, this.testServiceName, testServiceAddress, this.fileMap);
 			} catch (Exception e) {
 				log.error("Uploading test case data to " + this.testServiceName + " failure, caused by "
 						+ e.getMessage());
 			}
 		}
 
-		private String uploadToSingleNode(TestService testService, String s,String testServiceAddress, Map<String, byte[]> fileMap)
-				throws Exception {
+		private String uploadToSingleNode(TestService testService, String s, String testServiceAddress,
+				Map<String, byte[]> fileMap) throws Exception {
 
 			String remoteHome = getRemoteCloudHomePath(testService);
 
@@ -661,7 +666,8 @@ public class RemoteParallelUtil {
 							.substring(ConfigurationProxy.getCLOUDTEST_HOME().replace("\\", "/").length());
 
 					String caseFullPath = (remoteHome + "/" + uri).replace("\\", "/");
-					String errorMsg = uploadToRemoteSlaveNode(testService, fs, fileMap.get(fs), caseFullPath, s,testServiceAddress);
+					String errorMsg = uploadToRemoteSlaveNode(testService, fs, fileMap.get(fs), caseFullPath, s,
+							testServiceAddress);
 
 					if (!CommonUtils.isNullOrEmpty(errorMsg)) {
 						errs.append(errorMsg);
