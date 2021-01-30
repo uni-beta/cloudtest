@@ -163,6 +163,29 @@ public class CloudTestConstants {
 	 */
 	public static final String CLOUDTEST_MAIL_ROBOT_SERVICE_DEPLOYED_SERVER_NAME = "cloudtest.MailService.DeployedServerName";
 	/**
+	 * "cloudtest.mailservice.operation.post_flag"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_OPERATION_POST_FLAG = "cloudtest.mailservice.operation.post_flag";
+	/**
+	 * "cloudtest.mailservice.criteria.subject_prefix"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_CRITERIA_SUBJECT_PREFIX = "cloudtest.mailservice.criteria.subject_prefix";
+	/**
+	 * "cloudtest.mailservice.enabled"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_ENABLED = "cloudtest.mailservice.enabled";
+	
+	/**
+	 * "cloudtest.mailservice.refresh.interval_seconds"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_REFRESH_INTERVAL_SECONDS = "cloudtest.mailservice.refresh.interval_seconds";
+
+	/**
+	 * "cloudtest.mailservice.template.path_on_failed"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_TEMPLATE_PATH_ON_FAILED = "cloudtest.mailservice.template.path_on_failed";
+
+	/**
 	 * "cloudtest.mail.StoreProtocal"
 	 */
 	public static final String CLOUDTEST_MAIL_STORE_PROTOCAL = "cloudtest.mail.StoreProtocal";
@@ -415,7 +438,7 @@ public class CloudTestConstants {
 	public static final String CLOUDTEST_PARALLEL_REMOTE_UPLOAD_SERVICE_ENDPOINT = "cloudtest.parallel.remote.upload.service.endpoint";
 	public static final String CLOUDTEST_PARALLEL_RESTFUL_CHECK_MD5_ENABLE = "cloudtest.parallel.restful.check_md5.enable";
 	public static final String CLOUDTEST_PARALLEL_AUTH_TOKEN = "cloudtest.parallel.auth.token";
-	
+
 	public static final String FILE_UPLOAD_TARGET_FILE_PATH = "targetFilePath";
 	public static final String CLOUDTEST_OPERATION_FILE_UPLOAD = "file-upload";
 	public static final String CLOUDTEST_OPERATION = "cloudtest-operation";

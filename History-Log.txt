@@ -1,3 +1,7 @@
+[2021-01-31 v1.7.1]
+1. Enhanced configuration for mail service function
+2. Released v1.7.1
+
 [2020-11-06 v1.7.0]
 1. Refined runtime classloader management and integration
 2. Improved performance

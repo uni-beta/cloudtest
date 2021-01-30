@@ -56,7 +56,14 @@
     <param name="cloudtest.mail.smtp.timeout" value="60000" />
     <param name="cloudtest.mail.smtp.writetimeout" value="60000" />
 	
+	<param name="cloudtest.mailservice.enabled" value="false"/>
 	<param name="cloudtest.mailservice.DeployedServerName" value="computer name"/>
+	<param name="cloudtest.mailservice.criteria.subject_prefix" value="[cloudtest]"/>
+	<!-- post operation flag options:ANSWERED, DELETED, SEEN  -->
+	<param name="cloudtest.mailservice.operation.post_flag" value="ANSWERED"/>
+	<param name="cloudtest.mailservice.refresh.interval_seconds" value="30"/>
+	<param name="cloudtest.mailservice.template.path_on_failed" value="Config/response_template_on_failed.txt"/>
+	
 	<param name="cloudtest.loadtest.MaxDetailedResponseAmount" value="100000"/>
 
 	<!--Aggregator Type: className or casePath, by default is className -->

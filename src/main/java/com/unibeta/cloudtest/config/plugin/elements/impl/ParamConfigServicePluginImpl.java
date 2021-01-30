@@ -14,10 +14,8 @@ import static com.unibeta.cloudtest.constant.CloudTestConstants.*;
  */
 public class ParamConfigServicePluginImpl implements
         ParamConfigServicePlugin {
-
-    
-
-    public Boolean getAutomationTestSwitchFlag() throws Exception {
+  
+	public Boolean getAutomationTestSwitchFlag() throws Exception {
 
         String flag = PluginConfigProxy
                 .getParamValueByName(CLOUDTEST_AUTOMATION_TEST_SWITCH_FLAG);
@@ -117,4 +115,35 @@ public class ParamConfigServicePluginImpl implements
 
         return i;
     }
+
+	@Override
+	public boolean isMailRobotServiceEnabled() throws Exception {
+		 String enabled= PluginConfigProxy
+	                .getParamValueByName(CLOUDTEST_MAILSERVICE_ENABLED);
+		 return "true".equalsIgnoreCase(enabled);
+	}
+
+	@Override
+	public String getMailRobotServiceCriteriaOfSubjectPrefix() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_CRITERIA_SUBJECT_PREFIX);
+	}
+
+	@Override
+	public String getMailRobotServiceOperationOfPostFlag() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_OPERATION_POST_FLAG);
+	}
+
+	@Override
+	public String getMailRobotServiceRefreshIntervalSeconds() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_REFRESH_INTERVAL_SECONDS);
+	}
+
+	@Override
+	public String getMailRobotServiceResponseTemplatePathOnFailed() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_TEMPLATE_PATH_ON_FAILED);
+	}
 }

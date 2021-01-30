@@ -89,6 +89,46 @@ public interface ParamConfigServicePlugin extends CloudTestPlugin {
      * @throws Exception
      */
     public String getMailRobotServiceDeployedServerName() throws Exception;
+    
+    /**
+     * Check whether mail service is enabled or not.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public boolean isMailRobotServiceEnabled() throws Exception;
+    
+    /**
+     * gets criteria of subject prefix for mail service.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public String getMailRobotServiceCriteriaOfSubjectPrefix() throws Exception;
+    
+    /**
+     * gets post operation for mail service.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public String getMailRobotServiceOperationOfPostFlag() throws Exception;
+    
+    /**
+     * gets refresh time in seconds for mail service.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public String getMailRobotServiceRefreshIntervalSeconds() throws Exception;
+    
+    /**
+     * gets response template path on failed for mail service.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public String getMailRobotServiceResponseTemplatePathOnFailed() throws Exception;
 
     /**
      * Gets the max detailed load test response amount

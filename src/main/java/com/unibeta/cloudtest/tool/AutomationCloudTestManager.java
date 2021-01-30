@@ -29,7 +29,6 @@ import com.unibeta.cloudtest.tool.MailManager.MailReceiverObject;
 import com.unibeta.cloudtest.util.CloudTestUtils;
 import com.unibeta.vrules.parsers.ObjectSerializer;
 import com.unibeta.vrules.utils.CommonUtils;
-import com.unibeta.vrules.utils.XmlUtils;
 
 /**
  * AutomaticCloudTestManager manages automatic test tasks. Every 4hr~ 8hr will
@@ -43,7 +42,8 @@ public class AutomationCloudTestManager {
     private static final String SYSTEM_USER_NAME = System
             .getProperty("user.name");
     private static Timer timer = null;
-    private static Boolean isDeployed = false;
+    private static Boolean isAutomaticExecutionDeployed = false;
+    private static Boolean isMailServiceDeployed = false;
     private static Logger log = LoggerFactory
             .getLogger(AutomationCloudTestManager.class);
 
@@ -56,16 +56,19 @@ public class AutomationCloudTestManager {
     public static void deploy() {
 
         Boolean switchFlag = Boolean.FALSE;
+        Boolean mailServiceEnabled = Boolean.FALSE;
 
         try {
             switchFlag = CloudTestPluginFactory.getParamConfigServicePlugin()
                     .getAutomationTestSwitchFlag();
+            mailServiceEnabled = CloudTestPluginFactory.getParamConfigServicePlugin().isMailRobotServiceEnabled();
         } catch (Exception e) {
             switchFlag = Boolean.FALSE;
+            mailServiceEnabled = Boolean.FALSE;
         }
 
-        synchronized (isDeployed) {
-            if (switchFlag && !isDeployed) {
+        synchronized (isAutomaticExecutionDeployed) {
+            if (switchFlag && !isAutomaticExecutionDeployed) {
                 timer = getTimerInstance();
                 Random random = new Random();
 
@@ -88,11 +91,16 @@ public class AutomationCloudTestManager {
 
                 timer.schedule(new CloudTestTimerTask(), firstTime, period);
 
-                deployMailRobotService();
-
-                isDeployed = true;
+                isAutomaticExecutionDeployed = true;
             }
         }
+
+        synchronized (isMailServiceDeployed) {
+			if (mailServiceEnabled && !isMailServiceDeployed) {
+				deployMailRobotService();
+				isMailServiceDeployed = true;
+			}
+		}
     }
 
     public void handleMailRequest() {
@@ -157,7 +165,7 @@ public class AutomationCloudTestManager {
 
                 timer.schedule(new CloudTestTimerTask(), firstTime, period);
 
-                isDeployed = true;
+                isAutomaticExecutionDeployed = true;
             }
         }
     }
@@ -170,7 +178,7 @@ public class AutomationCloudTestManager {
             timer = null;
         }
 
-        isDeployed = false;
+        isAutomaticExecutionDeployed = false;
     }
 
     static Timer getTimerInstance() {
@@ -237,11 +245,17 @@ public class AutomationCloudTestManager {
             String from = null;
 
             try {
+            	
+            	String mailRobotServiceCriteriaOfSubjectPrefix = CloudTestPluginFactory
+						.getParamConfigServicePlugin().getMailRobotServiceCriteriaOfSubjectPrefix();
+            	String operaitonFlag = CloudTestPluginFactory
+						.getParamConfigServicePlugin().getMailRobotServiceOperationOfPostFlag();
+            	
                 for (MimeMessage m : mailReceiverObject.getMessages()) {
-
-                    if (null == m) {
-                        continue;
-                    }
+					
+					if (null == m || !m.getSubject().trim().startsWith(mailRobotServiceCriteriaOfSubjectPrefix)) {
+						continue;
+					}
 
                     if (MailManager.isContainAttch(m)) {
                         saveAndUnzipMailAttachments(m);
@@ -250,8 +264,16 @@ public class AutomationCloudTestManager {
                     if (!m.getFolder().isOpen()) {
                         m.getFolder().open(Folder.READ_WRITE);
                     }
-
-                    m.setFlag(Flags.Flag.DELETED, true);
+                    
+					if ("DELETED".equalsIgnoreCase(operaitonFlag)) {
+						m.setFlag(Flags.Flag.DELETED, true);
+					} else if ("ANSWERED".equalsIgnoreCase(operaitonFlag)) {
+						m.setFlag(Flags.Flag.ANSWERED, true);
+					} else if ("SEEN".equalsIgnoreCase(operaitonFlag)) {
+						m.setFlag(Flags.Flag.SEEN, true);
+					}else {
+						m.setFlag(Flags.Flag.RECENT, true);
+					}
 
                     if (null == m.getContent()) {
                         continue;
@@ -259,7 +281,7 @@ public class AutomationCloudTestManager {
 
                     from = convertAddress2String(m.getFrom());
 
-                    subject = m.getSubject() + " --Cloud Response From "
+                    subject = m.getSubject() + " --CloudTest Response From "
                             + SYSTEM_USER_NAME;
 
                     if (!m.getSubject().startsWith("RE:")) {
@@ -280,8 +302,8 @@ public class AutomationCloudTestManager {
                             + convertAddress2String(m.getReplyTo()) + "\n"
                             + "Subject:" + subject + "\n\n" + content;
 
-                    int indexOfStart = content.indexOf("<cloudTestCase");
-                    int indexOfEnd = content.indexOf("</cloudTestCase>");
+                    int indexOfStart = content.indexOf("<cloudtest");
+                    int indexOfEnd = content.indexOf("</cloudtest>");
 
                     if (!CommonUtils.isNullOrEmpty(content)
                             && indexOfStart >= 0 && indexOfEnd > 0) {
@@ -402,7 +424,7 @@ public class AutomationCloudTestManager {
      */
     public static Boolean isDeployed() {
 
-        return isDeployed;
+        return isAutomaticExecutionDeployed;
     }
 
     private static String TEST_CASE_TEMPLATE = null;
@@ -410,12 +432,21 @@ public class AutomationCloudTestManager {
     private final static String FAILED_MAIL_CONTENT = "\n\nNone valid test case  was found in your request.  "
             + "\n\nThis mail was responded by Cloud Test Mail Service Center, "
             + "please do not reply it if you have no more request. "
-            + "\nFor any support, please feel free to contact my author jordan.xue@ebaotech.com"
-            + (!CommonUtils.isNullOrEmpty(TEST_CASE_TEMPLATE) ? "\n\n Below is a cloud test case payload example for your reference:"
+            + "\nFor any support, please feel free to contact the owner of mail service via "+ getMailServiceOwnerMailAddress()
+            + (!CommonUtils.isNullOrEmpty(TEST_CASE_TEMPLATE) ? "\n\n Below is the helpful information your reference:"
                     + "\n" + getTestCaseTemplate()
                     : "")
             + "\n\nThanks & Best Regards "
-            + "\nfrom Cloud Test Mail Service Center" + "";
+            + "\nfrom CloudTest Mail Service Center" + "";
+
+	private static String getMailServiceOwnerMailAddress() {
+		try {
+			return CloudTestPluginFactory
+			.getParamConfigServicePlugin().getMailUserAddress();
+		} catch (Exception e) {
+			return "get mail service's owner mail address failed, caused by: " + e.getMessage();
+		}
+	}
 
     private static String getTestCaseTemplate() {
 
@@ -423,11 +454,12 @@ public class AutomationCloudTestManager {
             return TEST_CASE_TEMPLATE;
         } else {
             try {
-                TEST_CASE_TEMPLATE = XmlUtils.paserDocumentToString(XmlUtils
-                        .getDocumentByFileName(ConfigurationProxy
-                                .getCloudTestRootPath()
-                                + "TestCase"
-                                + File.separator + "testCaseTemplate.tc.xml"));
+                String path = ConfigurationProxy
+				        .getCloudTestRootPath()
+				        + File.separator + CloudTestPluginFactory
+						.getParamConfigServicePlugin().getMailRobotServiceResponseTemplatePathOnFailed();
+                
+				TEST_CASE_TEMPLATE = CloudTestUtils.readFileContent(path);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
