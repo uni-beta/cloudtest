@@ -14,6 +14,7 @@ import com.unibeta.cloudtest.config.ConfigurationProxy;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Param;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Plugin;
 import com.unibeta.cloudtest.config.plugin.PluginConfig.Recorder;
+import com.unibeta.cloudtest.util.ObjectDigester;
 import com.unibeta.vrules.parsers.ObjectSerializer;
 import com.unibeta.vrules.utils.CommonUtils;
 import com.unibeta.vrules.utils.XmlUtils;
@@ -226,7 +227,7 @@ public class PluginConfigProxy {
 		initParamValueMap();
 	}
 
-	private static void initCloudTestPluginInstancesMap() throws Exception {
+	private static void initCloudTestPluginInstancesMap() throws Exception  {
 
 		pluginConfig = loadGlobalPluginConfig();
 		if(null == pluginConfig){
@@ -260,8 +261,11 @@ public class PluginConfigProxy {
 						Class implementation = Class.forName(e.className.trim());
 						cloudTestPluginInstancesMap.put(e.id, implementation.newInstance());
 					} catch (Exception e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
+						try {
+							cloudTestPluginInstancesMap.put(e.id, ObjectDigester.fromJava(e.className.trim()));
+						} catch (Exception e3) {
+							logger.error(e3.getMessage(),e3);
+						}
 					}
 
 					continue;

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,6 +26,7 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -102,18 +104,35 @@ public class MailManager {
 					configServicePlugin.getMailPop3Port(),
 					configServicePlugin.getMailUserAddress(),
 					configServicePlugin.getMailUserPassword());
-			folder = store.getFolder("INBOX");
+			
+			String folderName = configServicePlugin.getMailRobotServiceStoreFolder();
+			String maxCount = configServicePlugin.getMailRobotServiceReceiveCount();
 
+			folder = store.getFolder(StringUtils.isBlank(folderName) ? "INBOX" : folderName);
 			folder.open(Folder.READ_WRITE);
 
-			messages = folder.getMessages();
-
-			for (Message msg : messages) {
+			if (!StringUtils.isBlank(maxCount) && StringUtils.isNumeric(maxCount)) {
+				int messageCount = folder.getMessageCount();
+				int start = messageCount - Integer.valueOf(maxCount);
+				
+				if (start >= 0) {
+					messages = folder.getMessages(start+1, messageCount);
+				} else {
+					messages = folder.getMessages(1, messageCount);
+				}
+			}else {
+				messages = folder.getMessages();
+			}
+			
+			for (int i = 0; i < messages.length; i++) {
+				Message msg = messages[i];
 
 				if (msg instanceof MimeMessage) {
 					pop3MessagesList.add((MimeMessage) msg);
 				}
 			}
+			
+			Collections.reverse(pop3MessagesList);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -170,7 +189,7 @@ public class MailManager {
 		MimeMessage mailmessage = senderimpl.createMimeMessage();
 
 		MimeMessageHelper messagehelper = new MimeMessageHelper(mailmessage,
-				true);
+				true,"UTF-8");
 		messagehelper.setFrom(configServicePlugin.getMailUserAddress());
 		messagehelper.setTo(mailto);
 		messagehelper.setSubject(subject);

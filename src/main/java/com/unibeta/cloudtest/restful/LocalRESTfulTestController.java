@@ -86,6 +86,7 @@ public class LocalRESTfulTestController {
 			result.setErrorMessage(CloudTestUtils.printExceptionStackTrace(e));
 		} finally {
 			CloudTestOutput output = null;
+			
 			try {
 				if (result.getTestCaseResults() != null
 						&& result.getTestCaseResults().size() == 1) {
@@ -94,7 +95,7 @@ public class LocalRESTfulTestController {
 					if (fromXML instanceof CloudTestOutput) {
 						output = (CloudTestOutput) fromXML;
 					} else {
-						output = result;
+						output = result.getTestCaseResults().get(0);
 					}
 				} else {
 					output = result;

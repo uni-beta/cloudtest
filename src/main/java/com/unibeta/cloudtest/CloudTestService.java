@@ -106,9 +106,8 @@ public class CloudTestService implements TestService {
 		} finally {
 			CacheManagerFactory.getThreadLocalInstance().clear();
 			setBatchRunning(false);
+			CloudTestUtils.processResultStatistics(output, false);
 		}
-
-		output.setReturnValue(null);
 
 		resolveParallelJobLockRisk(checkParallelJobLockRisk, output);
 		return output;
@@ -149,7 +148,7 @@ public class CloudTestService implements TestService {
 			}
 
 			doTestOutput.setCaseId(caseId);
-			doTestOutput.setReturnValue(null);
+			//doTestOutput.setReturnValue(null);
 
 			list.add(doTestOutput);
 		}
@@ -202,14 +201,14 @@ public class CloudTestService implements TestService {
 						// }
 
 						CloudTestOutput doTestOutput = null;
-						Boolean ignore = isIgnoreCase(testCase.ignore);
+						Boolean ignore = isIgnoreCase(testCase);
 						boolean exeDepends = false;
 
 						if (null == ignore) {
 							this.executeDependsCases(testCase);
 							exeDepends = true;
 
-							ignore = isIgnoreCase(testCase.ignore);
+							ignore = isIgnoreCase(testCase);
 						}
 
 						if ("true".equalsIgnoreCase(testCase.ignore.trim()) || (!Boolean.TRUE.equals(ignore))) {
@@ -263,6 +262,10 @@ public class CloudTestService implements TestService {
 	private CloudTestOutput invoke(Case c) throws Exception {
 
 		logger.debug("cloudtest is executing case[id = '" + c.id + "']");
+		
+		CacheManagerFactory.getThreadLocalInstance()
+		.put(CacheManagerFactory.getThreadLocalInstance()
+				.CACHE_TYPE_RUNTIME_DATA, CloudTestConstants.CLOUDTEST_SYSTEM_CASE, c);
 
 		CloudTestInput test = ConfigurationProxy.converCaseToCloudTestInput(c);
 		CloudTestOutput doTestOutput;
@@ -271,7 +274,7 @@ public class CloudTestService implements TestService {
 		if (CommonUtils.isNullOrEmpty(group)) {
 			group = c.group;
 		}
-
+		
 		doTestOutput = invoke(test);
 
 		if ("true".equalsIgnoreCase(c.returnFlag) && !CommonUtils.isNullOrEmpty(c.returnTo)
@@ -641,6 +644,7 @@ public class CloudTestService implements TestService {
 		List<String> filePathList = new ArrayList<String>();
 		List<CloudTestOutput> outputList = new ArrayList<CloudTestOutput>();
 		Boolean isDirectory = false;
+		Boolean isCaseIdSpecified = false;
 		Map<String, String[]> caseIdMap = new HashMap<String, String[]>();
 
 		for (CloudCaseInput caseInput : inputs) {
@@ -694,13 +698,22 @@ public class CloudTestService implements TestService {
 				CloudTestCase cloudTestCase = null;
 
 				try {
-					String[] caseIds = caseIdMap.get(CloudTestUtils.getContextedURI(filePath));
-
+					String[] caseIds = null;
+					isCaseIdSpecified = false;
+					
 					if (isDirectory) {
 						caseIds = null;
-					} else if (null != input.getCaseId() && input.getCaseId().length > 0
-							&& !Arrays.asList(new String[] { null, "", "?" }).contains(input.getCaseId()[0])) {
-						caseIds = input.getCaseId();
+					} else {
+						caseIds = caseIdMap.get(CloudTestUtils.getContextedURI(filePath));
+						
+						if (caseIds == null && null != input.getCaseId() && input.getCaseId().length > 0
+								&& !Arrays.asList(new String[] { null, "", "?" }).contains(input.getCaseId()[0])) {
+							caseIds = input.getCaseId();
+						}
+						
+						if (caseIds != null && caseIds.length > 0) {
+							isCaseIdSpecified = true;
+						}
 					}
 
 					// get input list by fileName and caseIds
@@ -709,14 +722,14 @@ public class CloudTestService implements TestService {
 						continue;
 					}
 
-					Boolean ignore = isIgnoreCase(cloudTestCase.ignore);
+					Boolean ignore = isIgnoreExpress(cloudTestCase.ignore);
 					boolean exeDepends = false;
 
 					if (null == ignore) {
 						executeRootDependsCases(cloudTestCase);
 						exeDepends = true;
 
-						ignore = isIgnoreCase(cloudTestCase.ignore);
+						ignore = isIgnoreExpress(cloudTestCase.ignore);
 					}
 
 					if (!Boolean.TRUE.equals(ignore)) {
@@ -736,7 +749,7 @@ public class CloudTestService implements TestService {
 						for (Case c : cases) {
 
 							if (c != null) {
-								executeTestCase(group, c, casePath, assertFileName, outputList);
+								executeTestCase(group, c, casePath, assertFileName, outputList,isCaseIdSpecified);
 							}
 
 							CacheManagerFactory.getThreadLocalInstance().remove(
@@ -856,7 +869,7 @@ public class CloudTestService implements TestService {
 
 					for (Case c : dependsCloudTestCase.testCase) {
 						
-						Boolean ignore = isIgnoreCase(c.ignore);
+						Boolean ignore = isIgnoreCase(c);
 						if (!Boolean.TRUE.equals(ignore)) {
 							this.executeDependsCases(c);
 							invoke(c);
@@ -952,7 +965,7 @@ public class CloudTestService implements TestService {
 		return (ns + ":" + depend).replace("\\", "/");
 	}
 
-	private Boolean isIgnoreCase(String ignoreExpress) {
+	private Boolean isIgnoreExpress(String ignoreExpress) {
 
 		Boolean ignore = false;
 		Object ignoreObj = null;
@@ -975,14 +988,26 @@ public class CloudTestService implements TestService {
 
 		return ignore;
 	}
+	
+	private Boolean isIgnoreCase(Case c) {
+		CacheManagerFactory.getThreadLocalInstance()
+		.put(CacheManagerFactory.getThreadLocalInstance()
+				.CACHE_TYPE_RUNTIME_DATA, CloudTestConstants.CLOUDTEST_SYSTEM_CASE, c);
+		return this.isIgnoreExpress(c.ignore);
+	}
 
 	private String checkAssertFile(String filePath, String assertRuleFile) {
 
 		String assertFileName = null;
-		String[] assertFileNames = CommonUtils.fetchIncludesFileNames(assertRuleFile, filePath);
+		String[] assertFileNames = null;
 
-		if (assertFileNames != null && assertFileNames.length > 0) {
-			assertFileName = assertFileNames[0];
+		if(!CommonUtils.isNullOrEmpty(assertRuleFile) && assertRuleFile.startsWith("TestCase")) {
+			assertFileName = ConfigurationProxy.getCloudTestRootPath() + "/" + assertRuleFile;
+		}else {
+			assertFileNames = CommonUtils.fetchIncludesFileNames(assertRuleFile, filePath);
+			if (assertFileNames != null && assertFileNames.length > 0) {
+				assertFileName = assertFileNames[0];
+			}
 		}
 
 		if (!CommonUtils.isNullOrEmpty(assertFileName)) {
@@ -1063,14 +1088,14 @@ public class CloudTestService implements TestService {
 	}
 
 	private Object executeTestCase(String group, Case c, String casePath, String assertFileName,
-			List<CloudTestOutput> outputList) {
+			List<CloudTestOutput> outputList, Boolean needReturnValue) {
 
 		CloudTestOutput testCaseOutput = new CloudTestOutput();
 
 		Object returnObj = null;
 		CloudTestInput input = null;
 
-		Boolean ignore = isIgnoreCase(c.ignore);
+		Boolean ignore = isIgnoreCase(c);
 		try {
 			input = ConfigurationProxy.converCaseToCloudTestInput(c);
 
@@ -1087,7 +1112,7 @@ public class CloudTestService implements TestService {
 						this.executeDependsCases(c);
 						exeDepends = true;
 
-						ignore = isIgnoreCase(c.ignore);
+						ignore = isIgnoreCase(c);
 					}
 
 					if (!Boolean.TRUE.equals(ignore)) {
@@ -1127,9 +1152,13 @@ public class CloudTestService implements TestService {
 				if (CommonUtils.isNullOrEmpty(testCaseOutput.getGroup())) {
 					testCaseOutput.setGroup(group);
 				}
+				if(!needReturnValue) {
+					testCaseOutput.setReturnValue(null);
+				}
+				
 				testCaseOutput.setCasePath(casePath);
 				testCaseOutput.setCaseId(this.evaluateDataByCondition(c.id, c.eachId));
-				testCaseOutput.setReturnValue(null);
+				
 				outputList.add(testCaseOutput);
 
 				logger.debug(c.id + "@" + casePath + " was done in " + testCaseOutput.getRunTime() + "s");
@@ -1220,7 +1249,7 @@ public class CloudTestService implements TestService {
 
 					this.executeDependsCases(c);
 
-					Boolean ignoreCase = this.isIgnoreCase(c.ignore);
+					Boolean ignoreCase = this.isIgnoreCase(c);
 					if (null == ignoreCase) {
 						logger.warn("eval ingore expression '" + c.ignore + "' failed for below 'eachvar' element:\n"
 								+ ObjectDigester.toXML(eachvar));
@@ -1725,17 +1754,20 @@ public class CloudTestService implements TestService {
 				if (output.getReturnValue() == null) {
 					output.setReturnValue(returnValue);
 				}
-				if (output.getReturns() == null) {
-					try {
-						output.setReturns(ObjectDigester.toXML(returnValue));
-					} catch (Exception e) {
-
-						logger.warn("Convert result to xml failure caused by " + e.getMessage(), e);
-						if (null != returnValue) {
-							output.setReturns(returnValue.toString());
-						}
-					}
-				}
+				
+				//this logic had been moved to com.unibeta.cloudtest.util.CloudTestUtils.processResultStatistics(CloudTestOutput, Boolean);
+//				if (output.getReturns() == null) {
+//					try {
+//						//output.setReturns(ObjectDigester.toXML(returnValue));
+//					} catch (Exception e) {
+//
+//						logger.warn("Convert result to xml failure caused by " + e.getMessage(), e);
+//						if (null != returnValue) {
+//							output.setReturns(returnValue.toString());
+//						}
+//					}
+//				}
+				
 				if (output.getRunTime() == null || output.getRunTime() == 0.0) {
 					output.setRunTime((end - start) / 1000.00);
 				}

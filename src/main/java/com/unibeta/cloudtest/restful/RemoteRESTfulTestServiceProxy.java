@@ -126,7 +126,16 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 
 			return out;
 		} else {
-			return output;
+
+			if (output.getTestCaseResults() != null
+					&& output.getTestCaseResults().size() == 1) {
+				return (CloudTestOutput) ObjectDigester.fromXML(output
+						.getTestCaseResults().get(0).getReturns());
+			} else if(output.getReturns() != null){
+				return (CloudTestOutput) ObjectDigester.fromXML(output.getReturns());
+			}else {
+				return output;
+			}
 		}
 
 	}
@@ -199,14 +208,9 @@ public class RemoteRESTfulTestServiceProxy implements TestService {
 
 		CloudTestCase cloudTestCase = buildCloudTestInputCase(input);
 		CloudTestOutput output = invoke(cloudTestCase);
+		
+		return output;
 
-		if (output.getTestCaseResults() != null
-				&& output.getTestCaseResults().size() == 1) {
-			return (CloudTestOutput) ObjectDigester.fromXML(output
-					.getTestCaseResults().get(0).getReturns());
-		} else {
-			return output;
-		}
 	}
 
 	private CloudTestCase buildCloudTestInputCase(CloudTestInput input) {

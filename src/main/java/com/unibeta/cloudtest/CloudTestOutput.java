@@ -7,8 +7,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import com.unibeta.cloudtest.assertion.AssertResult;
 import com.unibeta.cloudtest.config.bind.XmlCDATAAdatper;
+import com.unibeta.vrules.utils.CommonUtils;
 
 /**
  * <code>CloudTestOutput</code> a test response object.
@@ -163,8 +166,8 @@ public class CloudTestOutput implements Serializable {
     }
 
     public String getErrorMessage() {
-
-        return errorMessage;
+    	
+       return StringEscapeUtils.escapeXml(errorMessage);
     }
 
     public void setErrorMessage(String errorMsg) {

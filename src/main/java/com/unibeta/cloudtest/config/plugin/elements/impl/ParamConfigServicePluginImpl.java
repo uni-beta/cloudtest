@@ -14,11 +14,11 @@ import static com.unibeta.cloudtest.constant.CloudTestConstants.*;
  */
 public class ParamConfigServicePluginImpl implements
         ParamConfigServicePlugin {
-  
+
 	public Boolean getAutomationTestSwitchFlag() throws Exception {
 
         String flag = PluginConfigProxy
-                .getParamValueByName(CLOUDTEST_AUTOMATION_TEST_SWITCH_FLAG);
+                .getParamValueByName(CLOUDTEST_SCHEDULER_ENABLED);
 
         if ("true".equalsIgnoreCase(flag) || "yes".equalsIgnoreCase(flag)) {
             return Boolean.TRUE;
@@ -66,7 +66,7 @@ public class ParamConfigServicePluginImpl implements
     public String getMailRobotServiceDeployedServerName() throws Exception {
 
         return PluginConfigProxy
-                .getParamValueByName(CLOUDTEST_MAIL_ROBOT_SERVICE_DEPLOYED_SERVER_NAME);
+                .getParamValueByName(CLOUDTEST_MAIL_ROBOT_SERVICE_HOST_USERNAME);
     }
 
     public int getMaxDetailedLoadTestResponseAmount() throws Exception {
@@ -97,7 +97,7 @@ public class ParamConfigServicePluginImpl implements
         int i;
         
         String value = PluginConfigProxy
-                .getParamValueByName(CLOUDTEST_AUTOMATION_TEST_INTERVAL_HOURS);
+                .getParamValueByName(CLOUDTEST_SCHEDULER_CRON);
         
         if (CommonUtils.isNullOrEmpty(value)) {
             Random random = new Random();
@@ -145,5 +145,17 @@ public class ParamConfigServicePluginImpl implements
 	public String getMailRobotServiceResponseTemplatePathOnFailed() throws Exception {
 		return PluginConfigProxy
                 .getParamValueByName(CLOUDTEST_MAILSERVICE_TEMPLATE_PATH_ON_FAILED);
+	}
+
+	@Override
+	public String getMailRobotServiceStoreFolder() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_STORE_FOLDER);
+	}
+
+	@Override
+	public String getMailRobotServiceReceiveCount() throws Exception {
+		return PluginConfigProxy
+                .getParamValueByName(CLOUDTEST_MAILSERVICE_RECEIVE_COUNT);
 	}
 }

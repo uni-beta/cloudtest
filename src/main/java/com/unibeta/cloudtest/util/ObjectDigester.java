@@ -385,6 +385,7 @@ public class ObjectDigester {
 	private static Map<String, Object> buildRuntimeData() {
 		Map<String, Object> map = new HashMap<String, Object>();
 
+		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_GCACHE, CacheManagerFactory.getGlobalCacheInstance());
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CACHE, CacheManagerFactory.getThreadLocalInstance());
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_CLOUD_OBJECT, this_);
 		map.put(CloudTestConstants.CLOUDTEST_SYSTEM_ROOT_PATH, ConfigurationProxy.getCloudTestRootPath());

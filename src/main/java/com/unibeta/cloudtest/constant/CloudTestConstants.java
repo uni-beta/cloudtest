@@ -142,9 +142,13 @@ public class CloudTestConstants {
 	}
 
 	/**
-	 * "cloudtest.AutomationTest.IntervalHours"
+	 * "cloudtest.scheduler.enabled"
 	 */
-	public static final String CLOUDTEST_AUTOMATION_TEST_INTERVAL_HOURS = "cloudtest.AutomationTest.IntervalHours";
+	public static final String CLOUDTEST_SCHEDULER_ENABLED = "cloudtest.scheduler.enabled";
+	/**
+	 * "cloudtest.scheduler.cron"
+	 */
+	public static final String CLOUDTEST_SCHEDULER_CRON = "cloudtest.scheduler.cron";
 	/**
 	 * "cloudtest.WebService.EndpointAddress"
 	 */
@@ -159,9 +163,9 @@ public class CloudTestConstants {
 	 */
 	public static final String CLOUDTEST_MAX_DETAILED_LOAD_TEST_RESPONSE_AMOUNT = "cloudtest.LoadTest.MaxDetailedResponseAmount";
 	/**
-	 * "cloudtest.MailService.DeployedServerName"
+	 * "cloudtest.mailservice.host.username"
 	 */
-	public static final String CLOUDTEST_MAIL_ROBOT_SERVICE_DEPLOYED_SERVER_NAME = "cloudtest.MailService.DeployedServerName";
+	public static final String CLOUDTEST_MAIL_ROBOT_SERVICE_HOST_USERNAME = "cloudtest.mailservice.host.username";
 	/**
 	 * "cloudtest.mailservice.operation.post_flag"
 	 */
@@ -184,6 +188,15 @@ public class CloudTestConstants {
 	 * "cloudtest.mailservice.template.path_on_failed"
 	 */
 	public static final String CLOUDTEST_MAILSERVICE_TEMPLATE_PATH_ON_FAILED = "cloudtest.mailservice.template.path_on_failed";
+
+	/**
+	 * "cloudtest.mailservice.receive.count"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_RECEIVE_COUNT = "cloudtest.mailservice.receive.count";
+	/**
+	 * "cloudtest.mailservice.store.folder"
+	 */
+	public static final String CLOUDTEST_MAILSERVICE_STORE_FOLDER = "cloudtest.mailservice.store.folder";
 
 	/**
 	 * "cloudtest.mail.StoreProtocal"
@@ -213,10 +226,7 @@ public class CloudTestConstants {
 	 * "cloudtest.mail.UserAddress"
 	 */
 	public static final String CLOUDTEST_MAIL_USER_ADDRESS = "cloudtest.mail.UserAddress";
-	/**
-	 * "cloudtest.AutomationTest.SwitchFlag"
-	 */
-	public static final String CLOUDTEST_AUTOMATION_TEST_SWITCH_FLAG = "cloudtest.AutomationTest.SwitchFlag";
+	
 	/**
 	 * "cloudtest.Interface.Impls.SearchingIndex"
 	 */
@@ -281,12 +291,24 @@ public class CloudTestConstants {
 	public static final String CLOUDTEST_ASSERT_PRE_COMPILE_ENABLE = "cloudtest.assert.pre_compile.enable";
 
 	/**
+	 * System default parameter of global cache instance.<br>
+	 * Name: $gcache$<br>
+	 * Value:com.unibeta.cloudtest.config.CacheManagerFactory.getGlobalCacheInstance()
+	 */
+	public static final String CLOUDTEST_SYSTEM_GCACHE = "$gcache$";
+	/**
 	 * System default parameter of cache instance.<br>
 	 * Name: $cache$<br>
 	 * Value:com.unibeta.cloudtest.config.CacheManagerFactory.getInstance()
 	 */
 	public static final String CLOUDTEST_SYSTEM_CACHE = "$cache$";
 
+	/**
+	 * Current case instance in runtime.<br>
+	 * Name: $case$<br>
+	 * Value:com.unibeta.cloudtest.config.CloudTestCase.Case
+	 */
+	public static final String CLOUDTEST_SYSTEM_CASE = "$case$";
 	/**
 	 * System default parameter of CloudObject instance.<br>
 	 * Name: $CloudObject$<br>

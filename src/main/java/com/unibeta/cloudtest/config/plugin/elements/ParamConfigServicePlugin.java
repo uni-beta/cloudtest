@@ -129,6 +129,22 @@ public interface ParamConfigServicePlugin extends CloudTestPlugin {
      * @throws Exception
      */
     public String getMailRobotServiceResponseTemplatePathOnFailed() throws Exception;
+    
+    /**
+     * gets mail store folder for mail service.
+     * 
+     * @return folder name
+     * @throws Exception
+     */
+    public String getMailRobotServiceStoreFolder() throws Exception;
+    
+    /**
+     * gets receive count for mail service.
+     * 
+     * @return folder name
+     * @throws Exception
+     */
+    public String getMailRobotServiceReceiveCount() throws Exception;
 
     /**
      * Gets the max detailed load test response amount

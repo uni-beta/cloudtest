@@ -986,22 +986,46 @@ public class CloudTestUtils {
 		ResultStatistics resultStatistics = new ResultStatistics();
 		output.setResultStatistics(resultStatistics);
 
-		if (null == outputList) {
-			return;
-		}
-
 		int successNum = 0;
 		int faildNum = 0;
 		double cost = 0;
+
+		if(output.getReturnValue() != null) {
+			try {
+				output.setReturns(ObjectDigester.toXML(output.getReturnValue()));
+				output.setReturnValue(null);
+			} catch (Exception e) {
+				 log.warn("Convert result to xml failure caused by " + e.getMessage(), e);
+				if (null != output.getReturnValue()) {
+					output.setReturns(output.getReturnValue().toString());
+				}
+			}
+		}
+		
+		if (null == outputList) {
+			output.setResultStatistics(null);
+			return;
+		}
 
 		if (outputList.size() > 0) {
 			int total = outputList.size();
 			for (int i = 0; i < total; i++) {
 				CloudTestOutput cloudTestOutput = outputList.get(i);
+				Object returnValue = cloudTestOutput.getReturnValue();
 
 				if (isDirectory) {
 					cloudTestOutput.setReturnValue(null);
 					cloudTestOutput.setReturns(null);
+				} else if(returnValue != null) {
+					try {
+						cloudTestOutput.setReturns(ObjectDigester.toXML(returnValue));
+						cloudTestOutput.setReturnValue(null);
+					} catch (Exception e) {
+						 log.warn("Convert result to xml failure caused by " + e.getMessage(), e);
+						if (null != returnValue) {
+							cloudTestOutput.setReturns(returnValue.toString());
+						}
+					}
 				}
 
 				if (cloudTestOutput.getStatus()) {

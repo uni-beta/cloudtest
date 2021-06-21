@@ -409,7 +409,12 @@ public class JobMapReducer {
             if (o1 == null || o2 == null) {
                 return 0;
             }
-            return (o1.length() < o2.length()) ? -1 : 1;
+            
+            if(o1.length() == o2.length()) {
+            	return 0;
+            }else {
+            	return (o1.length() < o2.length()) ? -1 : 1;
+            }
         }
 
     }

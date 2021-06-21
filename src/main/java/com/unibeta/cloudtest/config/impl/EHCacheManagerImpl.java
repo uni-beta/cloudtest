@@ -77,8 +77,14 @@ public class EHCacheManagerImpl implements CacheManager {
 		for (String cacheName : threadLocalCachedNameSet.get()) {
 
 			if (null != cacheName && this.getCache(cacheName) != null && (taskSet == null || taskSet.size() == 0)) {
+				ehcache.getCache(cacheName).removeAll();
 				ehcache.removeCache(cacheName);
 			}
+		}
+		
+		if((taskSet == null || taskSet.size() == 0)) {
+			threadLocalCachedNameSet.get().clear();
+			threadLocalCachedNameSet.remove();
 		}
 
 	}
@@ -134,7 +140,9 @@ public class EHCacheManagerImpl implements CacheManager {
 					threadLocalCachedNameSet.set(new HashSet<String>());
 				}
 
-				threadLocalCachedNameSet.get().add(cacheName);
+				if (this.isThreadLocalCache()) {
+					threadLocalCachedNameSet.get().add(cacheName);
+				}
 			}
 			cache = ehcache.getCache(cacheName);
 		}

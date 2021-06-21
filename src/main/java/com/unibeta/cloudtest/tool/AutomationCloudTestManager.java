@@ -16,6 +16,7 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import com.unibeta.cloudtest.config.plugin.CloudTestPluginFactory;
 import com.unibeta.cloudtest.restful.LocalRESTfulTestController;
 import com.unibeta.cloudtest.tool.MailManager.MailReceiverObject;
 import com.unibeta.cloudtest.util.CloudTestUtils;
+import com.unibeta.cloudtest.util.ObjectDigester;
 import com.unibeta.vrules.parsers.ObjectSerializer;
 import com.unibeta.vrules.utils.CommonUtils;
 
@@ -89,7 +91,7 @@ public class AutomationCloudTestManager {
                 long period = 1000 * 60 * 60 * (2 + n); // the random period is
                 // 2hr ~8hr
 
-                timer.schedule(new CloudTestTimerTask(), firstTime, period);
+                timer.schedule(new CloudTestSchedulerTimerTask(), firstTime, period);
 
                 isAutomaticExecutionDeployed = true;
             }
@@ -114,13 +116,19 @@ public class AutomationCloudTestManager {
             if (SYSTEM_USER_NAME.equalsIgnoreCase(CloudTestPluginFactory
                     .getParamConfigServicePlugin()
                     .getMailRobotServiceDeployedServerName())) {
+            	
+            	String interval = CloudTestPluginFactory
+                        .getParamConfigServicePlugin().getMailRobotServiceRefreshIntervalSeconds();
+            	
+				long intervalSeconds = StringUtils.isBlank(interval) && StringUtils.isNumeric(interval) ? (1000 * 30)
+						: Long.valueOf(interval.trim());
 
                 Calendar calendar = Calendar.getInstance();
                 Date firstTime = calendar.getTime();
 
                 new Timer("MailServiceCenter", true).schedule(
                         new MailServiceCenterTimerTask(), firstTime,
-                        (1000 * 30));
+                        intervalSeconds * 1000);
             }
         } catch (Exception e) {
             log.error(
@@ -130,15 +138,14 @@ public class AutomationCloudTestManager {
 
     }
 
-    /**
-     * Deploy the automatic could test service only when
-     * 'CLOUD_TEST_SWITCH_FLAG' is 'true' in t_Gen_Const_Value table. Automatic
-     * Test Reportor will be triggered in every specified minutes.
-     * 
-     * @param everyMinutes
-     *            trigger time in minutes.
-     */
-    public static void deploy(Integer everyMinutes) {
+	/**
+	 * Deploy the automatic could test service only when
+	 * 'cloudtest.scheduler.enabled' is 'true'. Automatic Test Reportor will be
+	 * triggered in every specified minutes.
+	 * 
+	 * @param everyMinutes trigger time in minutes.
+	 */
+    public static void deployScheduler(Integer everyMinutes) {
 
         if (null == everyMinutes || everyMinutes == 0) {
             return;
@@ -163,7 +170,7 @@ public class AutomationCloudTestManager {
 
                 long period = 1000 * 60 * everyMinutes;
 
-                timer.schedule(new CloudTestTimerTask(), firstTime, period);
+                timer.schedule(new CloudTestSchedulerTimerTask(), firstTime, period);
 
                 isAutomaticExecutionDeployed = true;
             }
@@ -187,7 +194,7 @@ public class AutomationCloudTestManager {
         return new Timer("AutomaticCloudTester", true);
     }
 
-    static class CloudTestTimerTask extends TimerTask {
+    static class CloudTestSchedulerTimerTask extends TimerTask {
 
         private static final String CONFIG_CLOUD_TEST_REPORTOR_XML = "Config/CloudTestReportor.xml";
 
@@ -238,6 +245,8 @@ public class AutomationCloudTestManager {
                         e.getMessage()
                                 + CloudTestUtils.printExceptionStackTrace(e),
                         e.getCause());
+            	//if receive mail failed, log error and return
+            	return;
             }
 
             String originalContent = null;
@@ -253,7 +262,9 @@ public class AutomationCloudTestManager {
             	
                 for (MimeMessage m : mailReceiverObject.getMessages()) {
 					
-					if (null == m || !m.getSubject().trim().startsWith(mailRobotServiceCriteriaOfSubjectPrefix)) {
+					if (null == m || !m.getSubject().trim().startsWith(mailRobotServiceCriteriaOfSubjectPrefix)
+							|| m.getFlags().contains(Flags.Flag.DELETED) || m.getFlags().contains(Flags.Flag.ANSWERED)
+							|| m.getFlags().contains(Flags.Flag.SEEN)) {
 						continue;
 					}
 
@@ -269,10 +280,8 @@ public class AutomationCloudTestManager {
 						m.setFlag(Flags.Flag.DELETED, true);
 					} else if ("ANSWERED".equalsIgnoreCase(operaitonFlag)) {
 						m.setFlag(Flags.Flag.ANSWERED, true);
-					} else if ("SEEN".equalsIgnoreCase(operaitonFlag)) {
+					} else {
 						m.setFlag(Flags.Flag.SEEN, true);
-					}else {
-						m.setFlag(Flags.Flag.RECENT, true);
 					}
 
                     if (null == m.getContent()) {
@@ -309,16 +318,30 @@ public class AutomationCloudTestManager {
                             && indexOfStart >= 0 && indexOfEnd > 0) {
 
                         String caseStr = content.substring(indexOfStart,
-                                indexOfEnd + 16);
+                                indexOfEnd + "</cloudtest>".length());
 
-                        CloudTestOutput output = (CloudTestOutput) ObjectSerializer
+                        CloudTestOutput result = (CloudTestOutput) ObjectSerializer
                                 .unmarshalToObject(
                                          LocalRESTfulTestController
                                                 .invoke(caseStr),
                                         CloudTestOutput.class);
+                        
+                        Object returns =ObjectDigester.fromXML(result.getReturns());
+                        CloudTestOutput output = null;
+                        
+						if (returns instanceof CloudTestOutput) {
+							output = (CloudTestOutput) returns;
+						}else {
+                        	output = result;
+                        }
+						
+						if(null != output.getReturns()) {
+							String r = "Returns:\n" + output.getReturns();
+							output.setErrorMessage(output.getErrorMessage() == null ? r
+									: (r + "\nErrors:\n" + output.getErrorMessage()));
+						}
 
-                        new CloudTestReportor().sendReport(from, subject,
-                                output);
+						CloudTestReportor.sendReport(from, subject, output, "mailservice");
 
                     } else {
 

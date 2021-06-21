@@ -141,6 +141,7 @@ public class ConfigurationProxy {
 
         for (Case c : cloudTestCase.testCase) {
             c.nsLibs = cloudTestCase.nsLibs;
+            c.ns = cloudTestCase.ns;
         }
     }
 

@@ -249,6 +249,10 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 	}
 
 	private String buildHotspotsKey(CloudTestOutput out) {
+		
+		if(out.getCasePath() == null) {
+			out.setCasePath("null");
+		}
 
 		String[] keys = out.getCasePath().split(":");
 		String key = out.getCasePath();
@@ -793,7 +797,7 @@ public class ReportGeneratorPluginImpl implements ReportGeneratorPlugin {
 		if (!CommonUtils.isNullOrEmpty(cloudTestOutput.getErrorMessage())
 				&& !HEADLINE_LATEST_CLOUD_TEST_RESULT_STATISTICS.equals(headTitle)) {
 			s.append("<font size=1 face=Arial><span lang=EN-US style='font-size:10pt;font-weight:bold'>"
-					+ "Error Message:\n" + "\n" + "</span></font>"
+					+ "Messages:\n" + "\n" + "</span></font>"
 					+ "<table width='100%' border='1' cellpadding='0' cellspacing='0'>\n" + "<tr>\n"
 					+ "<td  align='left' > <pre>" + cloudTestOutput.getErrorMessage() + "</pre></td>\n" + "</tr>\n"
 					+ "</table>\n" + "<br>");
